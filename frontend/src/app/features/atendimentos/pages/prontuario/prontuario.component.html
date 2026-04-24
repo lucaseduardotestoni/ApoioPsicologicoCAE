@@ -1,0 +1,166 @@
+<div class="prontuario-page">
+  <div class="page-inner">
+
+    <!-- Header -->
+    <div class="page-top">
+      <div>
+        <h1 class="page-title">Prontuário do Estudante</h1>
+        <p class="page-sub">Busque um estudante para visualizar seu histórico de atendimentos.</p>
+      </div>
+      <a routerLink="/atendimentos/novo" class="btn-new">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+          <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+        </svg>
+        Novo Atendimento
+      </a>
+    </div>
+
+    <!-- Busca -->
+    <div class="search-card">
+      <div class="search-row">
+        <div class="search-input-wrap">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
+            <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+          </svg>
+          <input
+            type="text"
+            class="search-input"
+            placeholder="Buscar por nome ou matrícula..."
+            [(ngModel)]="termoBusca"
+            (keydown)="onKeydown($event)"
+          />
+        </div>
+        <button class="btn-buscar" (click)="onBuscar()" [disabled]="!termoBusca.trim() || buscando">
+          <span *ngIf="buscando" class="spinner-sm"></span>
+          {{ buscando ? 'Buscando...' : 'Buscar' }}
+        </button>
+      </div>
+
+      <!-- Resultados da busca -->
+      <div *ngIf="buscaRealizada && !estudanteSelecionado" class="search-results">
+        <div *ngIf="resultadosBusca.length === 0" class="no-results">
+          Nenhum estudante encontrado para "{{ termoBusca }}".
+        </div>
+        <div
+          *ngFor="let e of resultadosBusca"
+          class="result-item"
+          (click)="selecionarEstudante(e)"
+        >
+          <div class="result-avatar">{{ e.nome.charAt(0) }}</div>
+          <div class="result-info">
+            <span class="result-nome">{{ e.nome }}</span>
+            <span class="result-meta">Matrícula: {{ e.matricula }} · {{ e.curso }}</span>
+          </div>
+          <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16" class="result-arrow">
+            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Prontuário do estudante selecionado -->
+    <ng-container *ngIf="estudanteSelecionado">
+
+      <!-- Card do estudante -->
+      <div class="student-card">
+        <div class="student-avatar">{{ estudanteSelecionado.nome.charAt(0) }}</div>
+        <div class="student-info">
+          <h2 class="student-nome">{{ estudanteSelecionado.nome }}</h2>
+          <div class="student-meta">
+            <span>
+              <svg viewBox="0 0 24 24" fill="currentColor" width="13" height="13"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
+              Matrícula: {{ estudanteSelecionado.matricula }}
+            </span>
+            <span *ngIf="estudanteSelecionado.curso">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="13" height="13"><path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zM5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/></svg>
+              {{ estudanteSelecionado.curso }}
+            </span>
+            <span *ngIf="estudanteSelecionado.email">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="13" height="13"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+              {{ estudanteSelecionado.email }}
+            </span>
+          </div>
+        </div>
+        <div class="student-stats">
+          <div class="stat-item">
+            <span class="stat-num">{{ totalAtendimentos }}</span>
+            <span class="stat-lbl">Atendimentos</span>
+          </div>
+          <div class="stat-item" *ngIf="ultimoAtendimento">
+            <span class="stat-num">{{ ultimoAtendimento.data | date:'dd/MM' }}</span>
+            <span class="stat-lbl">Último</span>
+          </div>
+        </div>
+        <button class="btn-limpar" (click)="limparSelecao()" title="Nova busca">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+            <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Loading atendimentos -->
+      <div *ngIf="carregandoAtendimentos" class="loading-state">
+        <div class="spinner"></div> Carregando histórico...
+      </div>
+
+      <!-- Lista de atendimentos -->
+      <div *ngIf="!carregandoAtendimentos">
+
+        <div *ngIf="atendimentos.length === 0" class="empty-state">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="40" height="40" style="opacity:.3">
+            <path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+          </svg>
+          <p>Nenhum atendimento registrado para este estudante.</p>
+          <a [routerLink]="['/atendimentos/novo']" class="btn-new-sm">Registrar primeiro atendimento</a>
+        </div>
+
+        <div *ngFor="let a of atendimentos" class="atendimento-card">
+
+          <!-- Cabeçalho do card (sempre visível) -->
+          <div class="atend-header" (click)="toggleExpandir(a.id)">
+            <div class="atend-tipo-dot" [style.background]="tipoCores[a.tipo]"></div>
+            <div class="atend-summary">
+              <div class="atend-top-row">
+                <span class="atend-tipo" [style.color]="tipoCores[a.tipo]">{{ tipoLabels[a.tipo] }}</span>
+                <span class="atend-data">{{ a.data | date:'dd/MM/yyyy' }}</span>
+              </div>
+              <p class="atend-preview">{{ a.descricao | slice:0:100 }}{{ a.descricao.length > 100 ? '...' : '' }}</p>
+              <span class="atend-responsavel">
+                <svg viewBox="0 0 24 24" fill="currentColor" width="12" height="12"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                {{ a.responsavel }}
+              </span>
+            </div>
+            <button class="expand-btn" [class.expanded]="isExpandido(a.id)" aria-label="Expandir">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
+                <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Detalhes expandidos -->
+          <div class="atend-details" *ngIf="isExpandido(a.id)">
+            <div class="detail-section">
+              <h4 class="detail-label">Descrição completa</h4>
+              <p class="detail-text">{{ a.descricao }}</p>
+            </div>
+            <div class="detail-section" *ngIf="a.observacoes">
+              <h4 class="detail-label">Observações</h4>
+              <p class="detail-text">{{ a.observacoes }}</p>
+            </div>
+            <div class="detail-actions">
+              <a [routerLink]="['/atendimentos/editar', a.id]" class="action-btn">
+                <svg viewBox="0 0 24 24" fill="currentColor" width="13" height="13">
+                  <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                </svg>
+                Editar
+              </a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </ng-container>
+
+  </div>
+</div>

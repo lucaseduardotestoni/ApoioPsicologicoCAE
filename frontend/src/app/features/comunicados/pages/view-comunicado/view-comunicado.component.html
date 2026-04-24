@@ -1,0 +1,97 @@
+<div class="view-page">
+
+  <!-- ── Loading ───────────────────────────────────────────────────── -->
+  <div *ngIf="loading" class="view-page__loading">
+    <mat-spinner diameter="40"></mat-spinner>
+    <span>Carregando comunicado...</span>
+  </div>
+
+  <!-- ── Conteúdo ───────────────────────────────────────────────────── -->
+  <ng-container *ngIf="!loading && comunicado">
+
+    <!-- Cabeçalho -->
+    <div class="view-page__header">
+      <button mat-icon-button (click)="voltar()" matTooltip="Voltar à lista">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+
+      <div class="view-page__header-text">
+        <h1 class="view-page__title">{{ comunicado.titulo }}</h1>
+
+        <div class="view-page__meta">
+          <!-- Status -->
+          <span
+            class="status-badge"
+            [class.status-badge--ativo]="comunicado.ativo"
+            [class.status-badge--inativo]="!comunicado.ativo"
+          >
+            <mat-icon>{{ comunicado.ativo ? 'check_circle' : 'cancel' }}</mat-icon>
+            {{ comunicado.ativo ? 'Ativo' : 'Inativo' }}
+          </span>
+
+          <!-- Data -->
+          <span class="view-page__date">
+            <mat-icon>calendar_today</mat-icon>
+            {{ comunicado.dataEnvio | date: "dd 'de' MMMM 'de' yyyy 'às' HH:mm" : '' : 'pt-BR' }}
+          </span>
+        </div>
+      </div>
+
+      <button
+        mat-stroked-button
+        [routerLink]="['../../editar', comunicado.id]"
+        matTooltip="Editar comunicado"
+        class="view-page__edit-btn"
+      >
+        <mat-icon>edit</mat-icon>
+        Editar
+      </button>
+    </div>
+
+    <!-- Card: Mensagem -->
+    <mat-card class="view-page__card">
+      <mat-card-header>
+        <mat-icon mat-card-avatar class="card-icon card-icon--blue">campaign</mat-icon>
+        <mat-card-title>Mensagem</mat-card-title>
+      </mat-card-header>
+      <mat-divider></mat-divider>
+      <mat-card-content>
+        <p class="view-page__mensagem">{{ comunicado.mensagem }}</p>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Card: Grupos -->
+    <mat-card class="view-page__card">
+      <mat-card-header>
+        <mat-icon mat-card-avatar class="card-icon card-icon--green">group</mat-icon>
+        <mat-card-title>Grupos destinatários</mat-card-title>
+
+        <mat-card-subtitle>
+          {{ comunicado.grupos?.length || 0 }} grupo(s)
+        </mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-divider></mat-divider>
+
+      <mat-card-content>
+        <mat-chip-set *ngIf="(comunicado?.grupos?.length || 0) > 0; else semGrupos" class="view-page__chips">
+
+          <mat-chip
+            *ngFor="let grupo of comunicado.grupos"
+            [highlighted]="true"
+          >
+            <mat-icon matChipAvatar>group</mat-icon>
+            {{ grupo.nome || grupo.id }}
+          </mat-chip>
+
+        </mat-chip-set>
+
+        <ng-template #semGrupos>
+          <p class="view-page__empty">Nenhum grupo destinatário definido.</p>
+        </ng-template>
+      </mat-card-content>
+    </mat-card>
+
+  </ng-container>
+
+</div>

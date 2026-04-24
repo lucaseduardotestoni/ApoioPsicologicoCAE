@@ -1,0 +1,84 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()" class="comunicado-form" novalidate>
+
+  <div class="form-grid">
+
+    <!-- Título -->
+    <div class="form-group span-2">
+      <label for="titulo">
+        Título <span class="required">*</span>
+        <span class="char-count">{{ tituloLen }}/200</span>
+      </label>
+      <input
+        id="titulo"
+        type="text"
+        formControlName="titulo"
+        maxlength="200"
+        placeholder="Ex.: Atualização de sistemas internos"
+        autocomplete="off"
+        [class.input-error]="titulo.invalid && titulo.touched"
+      />
+      <span class="error-msg" *ngIf="titulo.touched && titulo.hasError('required')">Título é obrigatório.</span>
+      <span class="error-msg" *ngIf="titulo.touched && titulo.hasError('maxlength')">Máximo de 200 caracteres.</span>
+    </div>
+
+    <!-- Mensagem -->
+    <div class="form-group span-2">
+      <label for="mensagem">
+        Mensagem <span class="required">*</span>
+        <span class="char-count">{{ mensagemLen }}/5000</span>
+      </label>
+      <textarea
+        id="mensagem"
+        formControlName="mensagem"
+        rows="6"
+        maxlength="5000"
+        placeholder="Escreva aqui o conteúdo do comunicado..."
+        [class.input-error]="mensagem.invalid && mensagem.touched"
+      ></textarea>
+      <span class="error-msg" *ngIf="mensagem.touched && mensagem.hasError('required')">Mensagem é obrigatória.</span>
+    </div>
+
+    <!-- Status -->
+    <div class="form-group span-2">
+      <label class="toggle-label">
+        <span>Status do Comunicado</span>
+      </label>
+      <label class="toggle-row">
+        <div class="toggle-wrap">
+          <input type="checkbox" formControlName="ativo" class="toggle-input" id="ativo"/>
+          <span class="toggle-slider"></span>
+        </div>
+        <span class="toggle-text">
+          {{ form.get('ativo')?.value ? 'Comunicado ativo' : 'Comunicado inativo' }}
+        </span>
+        <span class="toggle-hint">Somente comunicados ativos aparecem para os usuários.</span>
+      </label>
+    </div>
+
+    <!-- Grupos destinatários -->
+    <div class="form-group span-2">
+      <label>Grupos Destinatários <span class="required">*</span></label>
+      <app-grupo-selector
+        [grupos]="grupos"
+        formControlName="grupoIds"
+        label=""
+      ></app-grupo-selector>
+      <span class="error-msg" *ngIf="grupoIds.touched && grupoIds.hasError('gruposObrigatorios')">
+        Selecione ao menos um grupo destinatário.
+      </span>
+    </div>
+
+  </div>
+
+  <!-- Ações -->
+  <div class="actions">
+    <button type="button" class="btn btn-secondary" (click)="onCancelar()" [disabled]="loading">
+      Cancelar
+    </button>
+    <button type="submit" class="btn btn-primary" [disabled]="loading">
+      <span *ngIf="loading" class="spinner"></span>
+      {{ loading ? 'Salvando...' : (comunicado ? 'Salvar Alterações' : 'Criar Comunicado') }}
+    </button>
+  </div>
+
+</form>

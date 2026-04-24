@@ -1,0 +1,45 @@
+$blue: #1565C0; $muted: #757575;
+
+.grupo-selector { display: flex; flex-direction: column; gap: 8px; }
+
+.gs-label {
+  font-size: 12px; font-weight: 600; color: #424242;
+}
+
+.gs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 8px;
+  padding: 14px 16px;
+  background: #F8F9FC;
+  border: 1.5px solid #E0E0E0;
+  border-radius: 7px;
+  transition: border-color .15s;
+  &:focus-within { border-color: $blue; box-shadow: 0 0 0 3px rgba($blue, .1); }
+}
+
+.gs-item {
+  display: inline-flex; align-items: center; gap: 8px;
+  cursor: pointer; user-select: none; padding: 4px 6px;
+  border-radius: 5px; transition: background .12s;
+  &:hover:not(.gs-item--disabled) { background: rgba($blue, .06); }
+  &--checked { color: $blue; }
+  &--disabled { opacity: .5; cursor: not-allowed; }
+}
+
+.gs-checkbox { display: none; }
+
+.gs-check-box {
+  width: 16px; height: 16px; border-radius: 4px; flex-shrink: 0;
+  border: 1.5px solid #BDBDBD; background: white;
+  display: flex; align-items: center; justify-content: center;
+  transition: background .12s, border-color .12s;
+
+  .gs-item--checked & {
+    background: $blue; border-color: $blue; color: white;
+  }
+}
+
+.gs-nome { font-size: 13px; font-weight: 500; color: #212121; }
+
+.gs-empty { font-size: 13px; color: $muted; font-style: italic; padding: 8px 0; }

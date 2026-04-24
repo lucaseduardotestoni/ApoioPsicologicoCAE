@@ -1,0 +1,211 @@
+$blue:#1565C0;
+$blue-dark:#0D47A1;
+$gold:#F9A825;
+$muted:#757575;
+$bg:#F5F6FA;
+$danger:#D32F2F;
+$success:#2E7D32;
+
+// ─────────────────────────────
+// Página
+// ─────────────────────────────
+.list-page {
+  background: $bg;
+  min-height: calc(100vh - 63px - 44px);
+}
+
+.page-inner {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 28px 16px;
+}
+
+// ─────────────────────────────
+// Topo
+// ─────────────────────────────
+.page-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 22px;
+  flex-wrap: wrap;
+}
+
+.page-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: $blue-dark;
+  margin-bottom: 4px;
+}
+
+.page-sub {
+  font-size: 13px;
+  color: $muted;
+}
+
+// ─────────────────────────────
+// Botão novo
+// ─────────────────────────────
+.btn-new {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  padding: 9px 18px;
+  background: $blue;
+  color: white;
+
+  border-radius: 7px;
+  text-decoration: none;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  transition: background .15s, transform .1s;
+
+  &:hover {
+    background: $blue-dark;
+  }
+
+  &:active {
+    transform: scale(.97);
+  }
+}
+
+// ─────────────────────────────
+// Card
+// ─────────────────────────────
+.card {
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 12px rgba(0,0,0,.08);
+  overflow: hidden;
+}
+
+// ─────────────────────────────
+// Tabela
+// ─────────────────────────────
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+
+  thead tr {
+    background: #F3F4F8;
+  }
+
+  th {
+    padding: 11px 16px;
+    text-align: left;
+
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .6px;
+
+    color: $muted;
+    border-bottom: 2px solid #E0E0E0;
+  }
+
+  td {
+    padding: 12px 16px;
+  }
+
+  tr {
+    border-bottom: 1px solid #F0F0F0;
+    transition: background .1s;
+  }
+
+  tr:hover td {
+    background: #FAFBFF;
+  }
+
+  tr:last-child {
+    border-bottom: none;
+  }
+}
+
+// ─────────────────────────────
+// Colunas
+// ─────────────────────────────
+.td-bold {
+  font-weight: 600;
+  color: #212121;
+}
+
+.td-muted {
+  color: $muted;
+  max-width: 220px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.col-actions {
+  text-align: right;
+  width: 120px;
+}
+
+// ─────────────────────────────
+// Chips status
+// ─────────────────────────────
+.chip {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 10px;
+
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .4px;
+  text-transform: uppercase;
+}
+
+.chip-ok {
+  background: rgba($success,.12);
+  color: $success;
+}
+
+.chip-off {
+  background: rgba($danger,.12);
+  color: $danger;
+}
+
+// ─────────────────────────────
+// Botões ação
+// ─────────────────────────────
+.action-btn {
+  font-size: 12px;
+  font-weight: 600;
+
+  color: $blue;
+  text-decoration: none;
+
+  padding: 4px 10px;
+  border-radius: 5px;
+
+  border: 1px solid rgba($blue,.3);
+
+  transition: background .15s;
+
+  &:hover {
+    background: rgba($blue,.08);
+  }
+}
+
+// ─────────────────────────────
+// Responsivo
+// ─────────────────────────────
+@media (max-width: 600px) {
+  .page-inner {
+    padding: 18px 10px;
+  }
+
+  .col-actions {
+    width: auto;
+  }
+
+  .data-table {
+    font-size: 13px;
+  }
+}

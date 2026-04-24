@@ -1,12 +1,16 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
+import { ApplicationConfig, LOCALE_ID } from '@angular/core';
 import { provideRouter } from '@angular/router';
-
+import { registerLocaleData } from '@angular/common';
+import localePtBr from '@angular/common/locales/pt';
 import { routes } from './app.routes';
-import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
+
+// Registra os dados do locale pt-BR globalmente
+// Necessário para o pipe `date` com locale 'pt-BR'
+registerLocaleData(localePtBr, 'pt-BR');
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideBrowserGlobalErrorListeners(),
-    provideRouter(routes), provideClientHydration(withEventReplay())
+    provideRouter(routes),
+    { provide: LOCALE_ID, useValue: 'pt-BR' },
   ]
 };
