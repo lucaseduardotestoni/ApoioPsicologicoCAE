@@ -1,0 +1,93 @@
+<div class="form-page">
+  <div class="page-inner">
+
+    <!-- Header -->
+    <div class="page-top">
+      <div>
+        <h1 class="page-title">{{ editMode ? 'Editar Programação' : 'Nova Programação' }}</h1>
+        <p class="page-sub">{{ editMode ? 'Atualize os dados do horário de atendimento.' : 'Cadastre um novo horário de atendimento da CAE.' }}</p>
+      </div>
+      <a routerLink="/agenda-cae" class="btn-back">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+          <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+        </svg>
+        Voltar
+      </a>
+    </div>
+
+    <!-- Formulário -->
+    <div class="card">
+      <form [formGroup]="form" (ngSubmit)="salvar()" novalidate>
+
+        <div class="form-grid">
+
+          <!-- Data -->
+          <div class="form-group">
+            <label for="data">Data <span class="required">*</span></label>
+            <input id="data" type="date" formControlName="data"
+              [class.input-error]="form.get('data')?.invalid && form.get('data')?.touched"/>
+            <span class="error-msg" *ngIf="form.get('data')?.invalid && form.get('data')?.touched">
+              Data é obrigatória.
+            </span>
+          </div>
+
+          <!-- Status -->
+          <div class="form-group">
+            <label for="disponivel">Status</label>
+            <select id="disponivel" formControlName="disponivel">
+              <option [ngValue]="true">Disponível</option>
+              <option [ngValue]="false">Indisponível</option>
+            </select>
+          </div>
+
+          <!-- Hora início -->
+          <div class="form-group">
+            <label for="horaInicio">Hora de Início <span class="required">*</span></label>
+            <input id="horaInicio" type="time" formControlName="horaInicio"
+              [class.input-error]="form.get('horaInicio')?.invalid && form.get('horaInicio')?.touched"/>
+            <span class="error-msg" *ngIf="form.get('horaInicio')?.invalid && form.get('horaInicio')?.touched">
+              Hora de início é obrigatória.
+            </span>
+          </div>
+
+          <!-- Hora fim -->
+          <div class="form-group">
+            <label for="horaFim">Hora de Fim <span class="required">*</span></label>
+            <input id="horaFim" type="time" formControlName="horaFim"
+              [class.input-error]="form.get('horaFim')?.invalid && form.get('horaFim')?.touched"/>
+            <span class="error-msg" *ngIf="form.get('horaFim')?.invalid && form.get('horaFim')?.touched">
+              Hora de fim é obrigatória.
+            </span>
+          </div>
+
+          <!-- Observação -->
+          <div class="form-group span-2">
+            <label for="observacao">
+              Observação
+              <span class="optional">(opcional)</span>
+            </label>
+            <textarea
+              id="observacao"
+              formControlName="observacao"
+              rows="4"
+              placeholder="Ex: Atendimento psicológico individual, prioridade para casos urgentes..."
+            ></textarea>
+          </div>
+
+        </div>
+
+        <!-- Ações -->
+        <div class="actions">
+          <button type="button" class="btn btn-secondary" (click)="cancelar()">
+            Cancelar
+          </button>
+          <button type="submit" class="btn btn-primary" [disabled]="form.invalid">
+            {{ editMode ? 'Salvar Alterações' : 'Cadastrar Horário' }}
+          </button>
+        </div>
+
+      </form>
+    </div>
+
+  </div>
+</div>

@@ -1,0 +1,77 @@
+// Variáveis de cores usadas no layout
+$blue:#1565C0;$blue-dark:#0D47A1;$muted:#757575;$bg:#F5F6FA;$danger:#D32F2F;$success:#2E7D32;$gold:#F9A825;
+
+// Layout geral da página
+.list-page{background:$bg;min-height:calc(100vh - 63px - 43px)}
+.page-inner{max-width:1000px;margin:0 auto;padding:28px 16px;display:flex;flex-direction:column;gap:20px}
+
+// Cabeçalho da página (título + botão)
+.page-top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.page-title{font-size:22px;font-weight:700;color:$blue-dark;margin-bottom:4px}
+.page-sub{font-size:13px;color:$muted}
+
+// Botão de criar novo
+.btn-new{display:inline-flex;align-items:center;gap:6px;padding:9px 20px;background:$blue;color:white;border-radius:7px;text-decoration:none;font-size:13px;font-weight:600;flex-shrink:0;transition:background .15s,transform .1s}
+.btn-new:hover{background:$blue-dark}
+.btn-new:active{transform:scale(.97)}
+
+// Cards de estatísticas
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px}
+.stat-card{background:white;border-radius:8px;box-shadow:0 1px 8px rgba(0,0,0,.06);padding:16px;display:flex;flex-direction:column;align-items:center;gap:4px;border:2px solid transparent;transition:box-shadow .2s,border-color .2s}
+.stat-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.1);border-color:rgba($blue,.2)}
+.stat-num{font-size:28px;font-weight:800;color:#212121}
+.stat-lbl{font-size:11px;color:$muted;text-transform:uppercase;letter-spacing:.6px}
+.stat-success .stat-num{color:$success}
+.stat-muted .stat-num{color:$muted}
+
+// Filtros da lista
+.filters-card{background:white;border-radius:8px;box-shadow:0 1px 8px rgba(0,0,0,.06);padding:16px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.filter-group{display:flex;align-items:center;gap:8px}
+.filter-label{font-size:13px;font-weight:600;color:#212121}
+.filter-select,.filter-input{padding:7px 12px;border:1.5px solid #BDBDBD;border-radius:6px;font-size:13px;outline:none;transition:border-color .2s}
+.filter-select:focus,.filter-input:focus{border-color:$blue;box-shadow:0 0 0 3px rgba($blue,.1)}
+.filter-select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath fill='%231565C0' d='M0 0l5 5 5-5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:32px;cursor:pointer}
+.filter-search{flex:1;min-width:250px}
+.filter-input{width:100%}
+.btn-clear{padding:7px 16px;background:rgba($danger,.08);color:$danger;border:1.5px solid rgba($danger,.3);border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;transition:background .15s}
+.btn-clear:hover{background:rgba($danger,.14)}
+
+// Estado de loading
+.loading-state{display:flex;align-items:center;justify-content:center;gap:10px;padding:60px;color:$muted;font-size:14px}
+.spinner{width:20px;height:20px;border:2px solid rgba($blue,.2);border-top-color:$blue;border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+// Tabela de dados
+.card{background:white;border-radius:10px;box-shadow:0 2px 12px rgba(0,0,0,.08);overflow:hidden}
+.data-table{width:100%;border-collapse:collapse;font-size:14px}
+.data-table thead tr{background:#F3F4F8}
+.data-table th{padding:11px 16px;text-align:left;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:$muted;border-bottom:2px solid #E0E0E0}
+.data-table tr{border-bottom:1px solid #F0F0F0;transition:background .1s}
+.data-table tr:last-child{border-bottom:none}
+.data-table tr.clickable-row{cursor:pointer}
+.data-table tr.clickable-row:hover td{background:#FAFBFF}
+.data-table td{padding:12px 16px;vertical-align:middle}
+
+// Colunas específicas
+.td-titulo{max-width:400px}
+.titulo-wrap{display:flex;flex-direction:column;gap:3px}
+.titulo-text{font-weight:600;color:#212121}
+.preview-msg{font-size:12px;color:$muted;line-height:1.4}
+.td-muted{color:$muted}
+.col-actions{text-align:right;width:200px}
+
+// Chips de status
+.chip{display:inline-block;padding:3px 10px;border-radius:10px;font-size:11px;font-weight:700;letter-spacing:.4px;text-transform:uppercase}
+.chip-ok{background:rgba($success,.1);color:$success}
+.chip-off{background:rgba($danger,.1);color:$danger}
+
+// Botões de ação
+.action-btn{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;padding:5px 10px;border-radius:5px;border:1px solid;cursor:pointer;background:none;text-decoration:none;transition:background .15s;margin-left:6px}
+.action-btn:first-child{margin-left:0}
+.btn-edit{color:$blue;border-color:rgba($blue,.3)}
+.btn-edit:hover{background:rgba($blue,.07)}
+.btn-toggle{color:$muted;border-color:rgba($muted,.3)}
+.btn-toggle:hover{background:rgba($muted,.06)}
+
+// Estado vazio (sem dados)
+.empty{text-align:center;color:$muted;padding:40px;font-size:14px}

@@ -1,0 +1,260 @@
+$blue:      #1565C0;
+$blue-mid:  #1976D2;
+$blue-dark: #0D47A1;
+$gold:      #F9A825;
+$bg:        #F5F6FA;
+$white:     #ffffff;
+$muted:     #757575;
+$header-h:  60px;
+
+// ── Shell wrapper ─────────────────────────────────────────────────
+.shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: $bg;
+  font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+}
+
+// ── Header ────────────────────────────────────────────────────────
+.header {
+  background: $blue;
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  box-shadow: 0 2px 12px rgba(0,0,0,.25);
+}
+
+.header-inner {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 0 24px;
+  height: $header-h;
+}
+
+// ── Logo ──────────────────────────────────────────────────────────
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  flex-shrink: 0;
+  margin-right: 32px;
+  transition: opacity .15s;
+  &:hover { opacity: .88; }
+}
+
+.logo-icon {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+}
+
+.logo-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.logo-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: $white;
+  letter-spacing: .3px;
+  line-height: 1.2;
+}
+
+.logo-sub {
+  font-size: 10px;
+  color: rgba(255,255,255,.65);
+  font-weight: 500;
+  letter-spacing: .8px;
+  text-transform: uppercase;
+}
+
+// ── Navbar desktop ────────────────────────────────────────────────
+.navbar {
+  display: flex;
+  align-items: stretch;
+  gap: 2px;
+  height: $header-h;
+  flex: 1;
+}
+
+.nav-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 16px;
+  color: rgba(255,255,255,.78);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: .2px;
+  transition: color .15s, background .15s;
+  border-bottom: 3px solid transparent;
+  white-space: nowrap;
+
+  &:hover {
+    color: $white;
+    background: rgba(255,255,255,.08);
+  }
+
+  &.active {
+    color: $white;
+    border-bottom-color: $gold;
+    background: rgba(255,255,255,.1);
+    font-weight: 600;
+  }
+}
+
+.nav-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  opacity: .85;
+}
+
+.active-dot {
+  display: none; // reservado para versões futuras
+}
+
+// ── Área do usuário ───────────────────────────────────────────────
+.user-area {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+  padding-left: 20px;
+  flex-shrink: 0;
+}
+
+.user-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.2);
+  border: 2px solid rgba(255,255,255,.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: $white;
+  letter-spacing: .5px;
+  flex-shrink: 0;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  @media (max-width: 768px) { display: none; }
+}
+
+.user-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: $white;
+  line-height: 1.2;
+}
+
+.user-role {
+  font-size: 10px;
+  color: rgba(255,255,255,.6);
+  text-transform: uppercase;
+  letter-spacing: .6px;
+}
+
+// ── Barra dourada ─────────────────────────────────────────────────
+.gold-bar {
+  height: 3px;
+  background: linear-gradient(90deg, $gold, lighten($gold, 8%));
+}
+
+// ── Hambúrguer (mobile) ───────────────────────────────────────────
+.hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  margin-left: 12px;
+
+  span {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: $white;
+    border-radius: 2px;
+    transition: transform .25s, opacity .2s;
+
+    &.open:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    &.open:nth-child(2) { opacity: 0; }
+    &.open:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+  }
+}
+
+// ── Menu mobile dropdown ──────────────────────────────────────────
+.mobile-menu {
+  display: none;
+  flex-direction: column;
+  background: $blue-dark;
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height .3s ease;
+
+  &.open {
+    max-height: 400px;
+  }
+}
+
+.mobile-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 24px;
+  color: rgba(255,255,255,.82);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  border-bottom: 1px solid rgba(255,255,255,.06);
+  transition: background .15s, color .15s;
+
+  &:hover { background: rgba(255,255,255,.08); color: $white; }
+  &.active { color: $gold; background: rgba(255,255,255,.05); }
+}
+
+// ── Conteúdo das rotas ────────────────────────────────────────────
+.content {
+  flex: 1;
+  // As páginas internas controlam seu próprio padding/max-width
+}
+
+// ── Footer ────────────────────────────────────────────────────────
+.footer {
+  background: $blue-dark;
+  color: rgba(255,255,255,.65);
+  text-align: center;
+  padding: 13px 16px;
+  font-size: 11px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.sep { opacity: .35; }
+
+// ── Responsivo ────────────────────────────────────────────────────
+@media (max-width: 768px) {
+  .navbar { display: none; }
+  .hamburger { display: flex; }
+  .mobile-menu { display: flex; }
+  .header-inner { padding: 0 16px; }
+}

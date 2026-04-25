@@ -1,0 +1,18 @@
+<form [formGroup]="form" novalidate class="grupo-form">
+  <div class="form-field">
+    <label class="form-label" for="nome">
+      Nome do Grupo <span class="required">*</span>
+    </label>
+    <input
+      id="nome"
+      type="text"
+      formControlName="nome"
+      class="form-input"
+      [class.is-invalid]="hasError('nome')"
+      placeholder="Ex.: Professores, Coordenação..."
+    />
+    <span class="form-error" *ngIf="hasError('nome', 'required')">Nome é obrigatório.</span>
+    <span class="form-error" *ngIf="hasError('nome', 'minlength')">Mínimo 3 caracteres.</span>
+    <span class="form-error" *ngIf="hasError('nome', 'maxlength')">Máximo 50 caracteres.</span>
+  </div>
+</form>

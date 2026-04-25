@@ -1,0 +1,324 @@
+// ─────────────────────────────────────────────────────────────────
+// Variáveis de cor seguindo identidade visual da FURB
+// ─────────────────────────────────────────────────────────────────
+$furb-blue:        #1565C0;
+$furb-blue-light:  #1976D2;
+$furb-blue-dark:   #0D47A1;
+$furb-gold:        #F9A825;
+$furb-gold-light:  #FBC02D;
+$danger:           #D32F2F;
+$success:          #2E7D32;
+$text-primary:     #212121;
+$text-secondary:   #616161;
+$border-color:     #BDBDBD;
+$border-focus:     $furb-blue;
+$bg-input:         #FFFFFF;
+$bg-disabled:      #F5F5F5;
+
+// ─────────────────────────────────────────────────────────────────
+// Form container
+// ─────────────────────────────────────────────────────────────────
+.usuario-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Campo genérico
+// ─────────────────────────────────────────────────────────────────
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: $text-primary;
+  letter-spacing: 0.2px;
+
+  .required {
+    color: $danger;
+    margin-left: 2px;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Input / Select base
+// ─────────────────────────────────────────────────────────────────
+.form-input {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1.5px solid $border-color;
+  border-radius: 6px;
+  font-size: 14px;
+  color: $text-primary;
+  background: $bg-input;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  outline: none;
+  box-sizing: border-box;
+
+  &::placeholder {
+    color: #9E9E9E;
+  }
+
+  &:focus {
+    border-color: $border-focus;
+    box-shadow: 0 0 0 3px rgba($furb-blue, 0.12);
+  }
+
+  &.is-invalid {
+    border-color: $danger;
+    box-shadow: 0 0 0 3px rgba($danger, 0.1);
+  }
+
+  &:disabled {
+    background: $bg-disabled;
+    cursor: not-allowed;
+    color: $text-secondary;
+  }
+}
+
+.form-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%231565C0' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 36px;
+  cursor: pointer;
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Input com botão de toggle (senha)
+// ─────────────────────────────────────────────────────────────────
+.input-with-toggle {
+  position: relative;
+
+  .form-input {
+    padding-right: 42px;
+  }
+
+  .toggle-btn {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 15px;
+    padding: 2px;
+    line-height: 1;
+    opacity: 0.7;
+    transition: opacity 0.15s;
+
+    &:hover { opacity: 1; }
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Mensagem de erro
+// ─────────────────────────────────────────────────────────────────
+.form-error {
+  font-size: 12px;
+  color: $danger;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  animation: slideDown 0.15s ease;
+
+  &::before {
+    content: '⚠';
+    font-size: 11px;
+  }
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Radio buttons customizados
+// ─────────────────────────────────────────────────────────────────
+.radio-group {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.radio-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  color: $text-primary;
+
+  .radio-input {
+    display: none;
+  }
+
+  .radio-custom {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 2px solid $border-color;
+    position: relative;
+    flex-shrink: 0;
+    transition: border-color 0.2s;
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      transition: transform 0.15s ease;
+    }
+
+    &.ativo::after   { background: $success; }
+    &.inativo::after { background: $danger; }
+  }
+
+  .radio-input:checked + .radio-custom {
+    border-color: $furb-blue;
+
+    &::after { transform: translate(-50%, -50%) scale(1); }
+  }
+
+  &:hover .radio-custom {
+    border-color: $furb-blue-light;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Checkbox customizado
+// ─────────────────────────────────────────────────────────────────
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  color: $text-primary;
+
+  .checkbox-input {
+    display: none;
+  }
+
+  .checkbox-custom {
+    width: 18px;
+    height: 18px;
+    border: 2px solid $border-color;
+    border-radius: 4px;
+    background: $bg-input;
+    flex-shrink: 0;
+    position: relative;
+    transition: background 0.15s, border-color 0.15s;
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 5px;
+      width: 5px;
+      height: 9px;
+      border: 2px solid white;
+      border-top: none;
+      border-left: none;
+      transform: rotate(45deg) scale(0);
+      transition: transform 0.15s ease;
+    }
+  }
+
+  .checkbox-input:checked + .checkbox-custom {
+    background: $furb-blue;
+    border-color: $furb-blue;
+
+    &::after {
+      transform: rotate(45deg) scale(1);
+    }
+  }
+
+  &:hover .checkbox-custom {
+    border-color: $furb-blue-light;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Botões
+// ─────────────────────────────────────────────────────────────────
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding-top: 8px;
+  border-top: 1px solid #EEEEEE;
+  margin-top: 4px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 24px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s ease, opacity 0.2s ease, transform 0.1s;
+  letter-spacing: 0.3px;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+  }
+
+  &:not(:disabled):active {
+    transform: scale(0.97);
+  }
+}
+
+.btn-primary {
+  background: $furb-blue;
+  color: white;
+
+  &:not(:disabled):hover {
+    background: $furb-blue-dark;
+  }
+}
+
+.btn-secondary {
+  background: transparent;
+  color: $furb-blue;
+  border: 1.5px solid $furb-blue;
+
+  &:not(:disabled):hover {
+    background: rgba($furb-blue, 0.06);
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Spinner de loading
+// ─────────────────────────────────────────────────────────────────
+.spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

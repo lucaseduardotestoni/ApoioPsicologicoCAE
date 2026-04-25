@@ -1,0 +1,38 @@
+<div class="form-page">
+  <div class="page-inner">
+
+    <!-- Header -->
+    <div class="page-top">
+      <div>
+        <h1 class="page-title">{{ isEditMode ? 'Editar Comunicado' : 'Novo Comunicado' }}</h1>
+        <p class="page-sub">
+          {{ isEditMode ? 'Atualize as informações do comunicado.' : 'Preencha os dados para criar um novo comunicado.' }}
+        </p>
+      </div>
+      <a routerLink="/comunicados" class="btn-back">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+          <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+        </svg>
+        Voltar
+      </a>
+    </div>
+
+    <!-- Loading inicial (modo edição) -->
+    <div *ngIf="isEditMode && loading && !comunicado" class="loading-state">
+      <div class="spinner"></div>
+      <span>Carregando comunicado...</span>
+    </div>
+
+    <!-- Card do formulário -->
+    <div class="card" *ngIf="!isEditMode || comunicado">
+      <app-comunicado-form
+        [comunicado]="comunicado"
+        [grupos]="grupos"
+        [loading]="loading"
+        (formSubmit)="onFormSubmit($event)"
+        (cancelar)="onCancelar()"
+      ></app-comunicado-form>
+    </div>
+
+  </div>
+</div>

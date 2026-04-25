@@ -1,0 +1,52 @@
+<div class="list-page">
+  <div class="page-inner">
+
+    <div class="page-top">
+      <div>
+        <h1 class="page-title">Usuários</h1>
+        <p class="page-sub">Gerencie os usuários com acesso ao sistema.</p>
+      </div>
+      <a routerLink="/usuarios/novo" class="btn-new">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+        Novo Usuário
+      </a>
+    </div>
+
+    <div *ngIf="isLoading" class="loading-state">
+      <div class="spinner"></div> Carregando...
+    </div>
+
+    <div *ngIf="!isLoading" class="card">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Status</th>
+            <th>Grupo</th>
+            <th>Criado em</th>
+            <th class="col-actions">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let u of usuarios">
+            <td class="td-nome">{{ u.nome }}</td>
+            <td>
+              <span class="chip" [class.chip-ok]="u.status === 'ATIVO'" [class.chip-off]="u.status !== 'ATIVO'">
+                {{ u.status }}
+              </span>
+            </td>
+            <td class="td-muted">{{ u.grupoUsuarioId }}</td>
+            <td class="td-muted">{{ u.horaCriado | date:'dd/MM/yyyy HH:mm' }}</td>
+            <td class="col-actions">
+              <a [routerLink]="['/usuarios/editar', u.id]" class="action-btn">Editar</a>
+            </td>
+          </tr>
+          <tr *ngIf="usuarios.length === 0">
+            <td colspan="5" class="empty">Nenhum usuário cadastrado.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>

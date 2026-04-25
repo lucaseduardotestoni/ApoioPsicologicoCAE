@@ -1,0 +1,84 @@
+<div class="perm-list">
+
+  <!-- Toolbar de ações rápidas -->
+  <div class="perm-toolbar">
+    <div class="toolbar-info">
+      <span class="section-title">Permissões do Grupo</span>
+      <span class="badge" [class.badge-active]="totalSelecionadas > 0">
+        {{ totalSelecionadas }} de {{ rows.length }} selecionadas
+      </span>
+    </div>
+    <div class="toolbar-actions">
+      <button type="button" class="btn-action btn-leitura" (click)="selecionarTudoLeitura()" [disabled]="isLoading">
+        ✓ Selecionar tudo como Leitura
+      </button>
+      <button type="button" class="btn-action btn-limpar" (click)="limparTudo()" [disabled]="isLoading">
+        ✕ Limpar permissões
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="loading-row">
+    <div class="mini-spinner"></div>
+    <span>Carregando permissões...</span>
+  </div>
+
+  <!-- Tabela -->
+  <div *ngIf="!isLoading" class="table-wrap">
+    <table class="perm-table">
+      <thead>
+        <tr>
+          <th class="col-nome">Permissão</th>
+          <th class="col-nivel">Nível de Acesso</th>
+          <th class="col-status">Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          *ngFor="let row of rows; trackBy: trackByPermissao"
+          class="perm-row"
+          [class.row-active]="row.nivelPermissaoIdSelecionado !== null"
+        >
+          <td class="col-nome">
+            <div class="perm-nome">{{ row.nome }}</div>
+          </td>
+
+          <td class="col-nivel">
+            <select
+              class="nivel-select"
+              [ngModel]="row.nivelPermissaoIdSelecionado === null ? 'null' : row.nivelPermissaoIdSelecionado.toString()"
+              (ngModelChange)="onNivelChange(row, $event)"
+            >
+              <option value="null">— Sem acesso —</option>
+              <option *ngFor="let nivel of niveis" [value]="nivel.id.toString()">
+                {{ nivel.descricao }}
+              </option>
+            </select>
+          </td>
+
+          <td class="col-status">
+            <span
+              class="status-chip"
+              [ngClass]="{
+                'chip-none':    row.nivelPermissaoIdSelecionado === null,
+                'chip-leitura': row.nivelPermissaoIdSelecionado === 1,
+                'chip-escrita': row.nivelPermissaoIdSelecionado === 2,
+                'chip-admin':   row.nivelPermissaoIdSelecionado === 3
+              }"
+            >
+              <ng-container [ngSwitch]="row.nivelPermissaoIdSelecionado">
+                <ng-container *ngSwitchCase="null">Sem acesso</ng-container>
+                <ng-container *ngSwitchCase="1">Leitura</ng-container>
+                <ng-container *ngSwitchCase="2">Escrita</ng-container>
+                <ng-container *ngSwitchCase="3">Admin</ng-container>
+                <ng-container *ngSwitchDefault>—</ng-container>
+              </ng-container>
+            </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>

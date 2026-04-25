@@ -1,0 +1,10 @@
+<div class="container">
+
+  <h2>Agendamentos dos estudantes</h2>
+
+  <div *ngFor="let a of service.agendamentos$ | async" class="card">
+    <p><b>Estudante:</b> {{ a.estudanteNome }}</p>
+    <p><b>Status:</b> {{ a.status }}</p>
+  </div>
+
+</div>

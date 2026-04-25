@@ -1,0 +1,30 @@
+<div class="grupo-selector">
+  <span class="gs-label">{{ label }}</span>
+
+  <div class="gs-grid" *ngIf="grupos.length > 0">
+    <label
+      *ngFor="let grupo of grupos; trackBy: trackById"
+      class="gs-item"
+      [class.gs-item--checked]="isChecked(grupo.id!)"
+      [class.gs-item--disabled]="isDisabled"
+    >
+      <input
+        type="checkbox"
+        class="gs-checkbox"
+        [checked]="isChecked(grupo.id!)"
+        [disabled]="isDisabled"
+        (change)="toggle(grupo.id!)"
+      />
+      <span class="gs-check-box">
+        <svg *ngIf="isChecked(grupo.id!)" viewBox="0 0 24 24" fill="currentColor" width="13" height="13">
+          <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+        </svg>
+      </span>
+      <span class="gs-nome">{{ grupo.nome }}</span>
+    </label>
+  </div>
+
+  <span *ngIf="grupos.length === 0" class="gs-empty">
+    Nenhum grupo disponível.
+  </span>
+</div>

@@ -1,0 +1,81 @@
+<div class="list-page">
+  <div class="page-inner">
+
+    <!-- Header -->
+    <div class="page-top">
+      <div>
+        <h1 class="page-title">Atendimentos</h1>
+        <p class="page-sub">Registros de atendimentos realizados pelo CAE.</p>
+      </div>
+      <a routerLink="/atendimentos/novo" class="btn-new">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+          <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+        </svg>
+        Novo Atendimento
+      </a>
+    </div>
+
+    <!-- Filtros -->
+    <div class="filters-card">
+      <div class="filter-group">
+        <label class="filter-label">Tipo:</label>
+        <select class="filter-select" [(ngModel)]="filtroTipo" (ngModelChange)="aplicarFiltros()">
+          <option value="">Todos</option>
+          <option *ngFor="let t of tipoOptions" [value]="t.value">{{ t.label }}</option>
+        </select>
+      </div>
+      <div class="filter-group filter-search">
+        <label class="filter-label">Buscar:</label>
+        <input
+          type="text"
+          class="filter-input"
+          placeholder="Estudante ou responsável..."
+          [(ngModel)]="busca"
+          (ngModelChange)="aplicarFiltros()"
+        />
+      </div>
+      <button class="btn-clear" *ngIf="temFiltro" (click)="limparFiltros()">
+        Limpar filtros
+      </button>
+    </div>
+
+    <!-- Loading -->
+    <div *ngIf="isLoading" class="loading-state">
+      <div class="spinner"></div> Carregando atendimentos...
+    </div>
+
+    <!-- Tabela -->
+    <div *ngIf="!isLoading" class="card">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Estudante</th>
+            <th>Data</th>
+            <th>Tipo</th>
+            <th>Responsável</th>
+            <th class="col-actions">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let a of filtrados">
+            <td class="td-nome">{{ a.estudanteNome }}</td>
+            <td class="td-muted">{{ a.data | date:'dd/MM/yyyy' }}</td>
+            <td>
+              <span class="chip chip-tipo">{{ tipoLabels[a.tipo] }}</span>
+            </td>
+            <td class="td-muted">{{ a.responsavel }}</td>
+            <td class="col-actions">
+              <a [routerLink]="['/atendimentos/editar', a.id]" class="action-btn">Editar</a>
+            </td>
+          </tr>
+          <tr *ngIf="filtrados.length === 0">
+            <td colspan="5" class="empty">
+              {{ temFiltro ? 'Nenhum atendimento encontrado com os filtros aplicados.' : 'Nenhum atendimento registrado.' }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>

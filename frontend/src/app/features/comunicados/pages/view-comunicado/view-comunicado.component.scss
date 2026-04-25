@@ -1,0 +1,158 @@
+.view-page {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 32px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  // ── Loading ─────────────────────────────────────────────────────────────
+  &__loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    padding: 64px 0;
+    color: rgba(0, 0, 0, 0.54);
+    font-size: 14px;
+  }
+
+  // ── Cabeçalho ───────────────────────────────────────────────────────────
+  &__header {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  &__header-text {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__title {
+    margin: 0 0 10px;
+    font-size: 22px;
+    font-weight: 600;
+    color: rgba(0, 0, 0, 0.87);
+    line-height: 1.35;
+    word-break: break-word;
+  }
+
+  &__meta {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  &__date {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 13px;
+    color: rgba(0, 0, 0, 0.54);
+
+    mat-icon {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+    }
+  }
+
+  &__edit-btn {
+    flex-shrink: 0;
+  }
+
+  // ── Cards ────────────────────────────────────────────────────────────────
+  &__card {
+    border-radius: 12px !important;
+
+    mat-card-header {
+      padding: 16px 16px 0;
+      align-items: center;
+    }
+
+    mat-card-content {
+      padding: 16px !important;
+      margin-top: 0 !important;
+    }
+
+    mat-card-title {
+      font-size: 15px !important;
+      font-weight: 600 !important;
+    }
+  }
+
+  // ── Mensagem ─────────────────────────────────────────────────────────────
+  &__mensagem {
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.75;
+    color: rgba(0, 0, 0, 0.8);
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  // ── Chips dos grupos ─────────────────────────────────────────────────────
+  &__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  &__empty {
+    margin: 0;
+    font-size: 14px;
+    color: rgba(0, 0, 0, 0.38);
+    font-style: italic;
+  }
+}
+
+// ── Avatar dos cards ──────────────────────────────────────────────────────────
+.card-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px !important;
+  height: 36px !important;
+  border-radius: 8px !important;
+  font-size: 20px !important;
+
+  &--blue {
+    background: #e3f2fd;
+    color: #1565c0;
+  }
+
+  &--green {
+    background: #e8f5e9;
+    color: #2e7d32;
+  }
+}
+
+// ── Badge de status ───────────────────────────────────────────────────────────
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px 3px 6px;
+  border-radius: 14px;
+  font-size: 12px;
+  font-weight: 500;
+
+  mat-icon {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+  }
+
+  &--ativo {
+    background: #e8f5e9;
+    color: #2e7d32;
+  }
+
+  &--inativo {
+    background: #fce4ec;
+    color: #c62828;
+  }
+}

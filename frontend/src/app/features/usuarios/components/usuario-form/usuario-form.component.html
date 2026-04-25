@@ -1,0 +1,157 @@
+<!-- 
+  Template do formulário reutilizável de usuário.
+  Toda lógica está no .ts — este template apenas vincula dados e exibe erros.
+-->
+<form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate class="usuario-form">
+
+  <!-- ── NOME ──────────────────────────────────────── -->
+  <div class="form-field">
+    <label for="nome" class="form-label">
+      Nome de Usuário <span class="required">*</span>
+    </label>
+    <input
+      id="nome"
+      type="text"
+      formControlName="nome"
+      class="form-input"
+      [class.is-invalid]="hasError('nome')"
+      placeholder="Ex.: joao.silva"
+      autocomplete="username"
+    />
+    <div class="form-error" *ngIf="hasError('nome', 'required')">
+      Nome é obrigatório.
+    </div>
+    <div class="form-error" *ngIf="hasError('nome', 'minlength')">
+      Nome deve ter no mínimo 3 caracteres.
+    </div>
+    <div class="form-error" *ngIf="hasError('nome', 'maxlength')">
+      Nome deve ter no máximo 20 caracteres.
+    </div>
+  </div>
+
+  <!-- ── SENHA ─────────────────────────────────────── -->
+  <div class="form-field">
+    <label for="senha" class="form-label">
+      Senha <span class="required">*</span>
+    </label>
+    <div class="input-with-toggle">
+      <input
+        id="senha"
+        [type]="showSenha ? 'text' : 'password'"
+        formControlName="senha"
+        class="form-input"
+        [class.is-invalid]="hasError('senha')"
+        placeholder="Mínimo 6 caracteres"
+        autocomplete="new-password"
+      />
+      <button type="button" class="toggle-btn" (click)="showSenha = !showSenha" tabindex="-1">
+        {{ showSenha ? '1' : '0' }}
+      </button>
+    </div>
+    <div class="form-error" *ngIf="hasError('senha', 'required')">
+      Senha é obrigatória.
+    </div>
+    <div class="form-error" *ngIf="hasError('senha', 'minlength')">
+      Senha deve ter no mínimo 6 caracteres.
+    </div>
+  </div>
+
+  <!-- ── CONFIRMAÇÃO DE SENHA ───────────────────────── -->
+  <div class="form-field">
+    <label for="confirmacaoSenha" class="form-label">
+      Confirmar Senha <span class="required">*</span>
+    </label>
+    <div class="input-with-toggle">
+      <input
+        id="confirmacaoSenha"
+        [type]="showConfirmacao ? 'text' : 'password'"
+        formControlName="confirmacaoSenha"
+        class="form-input"
+        [class.is-invalid]="hasError('confirmacaoSenha')"
+        placeholder="Repita a senha"
+        autocomplete="new-password"
+      />
+      <button type="button" class="toggle-btn" (click)="showConfirmacao = !showConfirmacao" tabindex="-1">
+        {{ showConfirmacao ? '1' : "0" }}
+      </button>
+    </div>
+    <div class="form-error" *ngIf="hasError('confirmacaoSenha', 'required')">
+      Confirmação de senha é obrigatória.
+    </div>
+    <div class="form-error" *ngIf="hasError('confirmacaoSenha', 'passwordMismatch')">
+      As senhas não conferem.
+    </div>
+  </div>
+
+  <!-- ── GRUPO DE USUÁRIO ───────────────────────────── -->
+  <div class="form-field">
+    <label for="grupoUsuarioId" class="form-label">
+      Grupo de Usuário <span class="required">*</span>
+    </label>
+    <select
+      id="grupoUsuarioId"
+      formControlName="grupoUsuarioId"
+      class="form-input form-select"
+      [class.is-invalid]="hasError('grupoUsuarioId')"
+    >
+      <option [ngValue]="null" disabled>Selecione um grupo...</option>
+      <option *ngFor="let grupo of grupos" [ngValue]="grupo.id">
+        {{ grupo.nome }}
+      </option>
+    </select>
+    <div class="form-error" *ngIf="hasError('grupoUsuarioId', 'required')">
+      Grupo de usuário é obrigatório.
+    </div>
+  </div>
+
+  <!-- ── STATUS ─────────────────────────────────────── -->
+  <div class="form-field">
+    <label class="form-label">Status</label>
+    <div class="radio-group">
+      <label class="radio-label">
+        <input type="radio" formControlName="status" value="ATIVO" class="radio-input" />
+        <span class="radio-custom ativo"></span>
+        Ativo
+      </label>
+      <label class="radio-label">
+        <input type="radio" formControlName="status" value="INATIVO" class="radio-input" />
+        <span class="radio-custom inativo"></span>
+        Inativo
+      </label>
+    </div>
+  </div>
+
+  <!-- ── TROCA DE SENHA ─────────────────────────────── -->
+  <div class="form-field">
+    <label class="checkbox-label">
+      <input
+        type="checkbox"
+        formControlName="mudaSenha"
+        class="checkbox-input"
+      />
+      <span class="checkbox-custom"></span>
+      Obrigar troca de senha no primeiro login
+    </label>
+  </div>
+
+  <!-- ── AÇÕES ──────────────────────────────────────── -->
+  <div class="form-actions">
+    <button
+      type="button"
+      class="btn btn-secondary"
+      (click)="onCancelar()"
+      [disabled]="isLoading"
+    >
+      Cancelar
+    </button>
+    <button
+      type="submit"
+      class="btn btn-primary"
+      [disabled]="isLoading"
+    >
+      <span *ngIf="isLoading" class="spinner"></span>
+      <span>{{ isLoading ? 'Salvando...' : 'Cadastrar Usuário' }}</span>
+    </button>
+  </div>
+
+</form>

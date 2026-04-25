@@ -1,0 +1,23 @@
+$blue: #1565C0;
+$danger: #D32F2F;
+
+.grupo-form { display: flex; flex-direction: column; gap: 6px; }
+
+.form-label {
+  font-size: 13px; font-weight: 600; color: #212121;
+  .required { color: $danger; margin-left: 2px; }
+}
+
+.form-input {
+  width: 100%; padding: 9px 12px;
+  border: 1.5px solid #BDBDBD; border-radius: 6px;
+  font-size: 14px; outline: none; transition: border-color .2s, box-shadow .2s;
+  &::placeholder { color: #9E9E9E; }
+  &:focus { border-color: $blue; box-shadow: 0 0 0 3px rgba($blue,.12); }
+  &.is-invalid { border-color: $danger; box-shadow: 0 0 0 3px rgba($danger,.1); }
+}
+
+.form-error {
+  font-size: 12px; color: $danger; display: flex; align-items: center; gap: 4px;
+  &::before { content: '⚠'; font-size: 11px; }
+}
