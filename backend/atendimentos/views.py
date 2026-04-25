@@ -1,3 +1,8 @@
-from django.shortcuts import render
+from rest_framework.viewsets import ModelViewSet
+from .models import RegistroAtendimento
+from .serializers import AtendimentoSerializer
 
-# Create your views here.
+
+class AtendimentoViewSet(ModelViewSet):
+    queryset = RegistroAtendimento.objects.all()
+    serializer_class = AtendimentoSerializer

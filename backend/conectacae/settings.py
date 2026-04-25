@@ -39,9 +39,13 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     
     'usuarios',
+    'permissoes',
+    'estudantes',
+    'agenda',
     'atendimentos',
     'comunicados',
-    'core',
+    'auditoria',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -81,8 +85,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'conectacae',
-        'USER': 'root',
-        'PASSWORD': 'password',
+        'USER': 'postgres',
+        'PASSWORD': '123',
         'HOST': 'localhost',
         'PORT': '5432',
     }
@@ -107,6 +111,11 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
