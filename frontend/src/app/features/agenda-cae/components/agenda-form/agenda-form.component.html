@@ -1,0 +1,66 @@
+<div class="card">
+  <form [formGroup]="form" (ngSubmit)="formSubmit.emit()" novalidate>
+
+    <div class="form-grid">
+
+      <div class="form-group">
+        <label for="data">Data <span class="required">*</span></label>
+        <input id="data" type="date" formControlName="data"
+          [class.input-error]="form.get('data')?.invalid && form.get('data')?.touched" />
+        <span class="error-msg" *ngIf="form.get('data')?.invalid && form.get('data')?.touched">
+          Data é obrigatória.
+        </span>
+      </div>
+
+      <div class="form-group">
+        <label for="disponivel">Status</label>
+        <select id="disponivel" formControlName="disponivel">
+          <option [ngValue]="true">Disponível</option>
+          <option [ngValue]="false">Indisponível</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="horaInicio">Hora de Início <span class="required">*</span></label>
+        <input id="horaInicio" type="time" formControlName="horaInicio"
+          [class.input-error]="form.get('horaInicio')?.invalid && form.get('horaInicio')?.touched" />
+        <span class="error-msg" *ngIf="form.get('horaInicio')?.invalid && form.get('horaInicio')?.touched">
+          Hora de início é obrigatória.
+        </span>
+      </div>
+
+      <div class="form-group">
+        <label for="horaFim">Hora de Fim <span class="required">*</span></label>
+        <input id="horaFim" type="time" formControlName="horaFim"
+          [class.input-error]="form.get('horaFim')?.invalid && form.get('horaFim')?.touched" />
+        <span class="error-msg" *ngIf="form.get('horaFim')?.invalid && form.get('horaFim')?.touched">
+          Hora de fim é obrigatória.
+        </span>
+      </div>
+
+      <div class="form-group span-2">
+        <label for="observacao">
+          Observação
+          <span class="optional">(opcional)</span>
+        </label>
+        <textarea
+          id="observacao"
+          formControlName="observacao"
+          rows="4"
+          placeholder="Ex: Atendimento psicológico individual, prioridade para casos urgentes..."
+        ></textarea>
+      </div>
+
+    </div>
+
+    <div class="actions">
+      <button type="button" class="btn btn-secondary" (click)="cancelar.emit()">
+        Cancelar
+      </button>
+      <button type="submit" class="btn btn-primary" [disabled]="form.invalid || isLoading">
+        {{ isLoading ? 'Salvando...' : submitLabel }}
+      </button>
+    </div>
+
+  </form>
+</div>

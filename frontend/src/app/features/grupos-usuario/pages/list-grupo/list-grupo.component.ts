@@ -32,7 +32,7 @@ export class ListGrupoComponent implements OnInit {
     this.errorMessage = null;
 
     this.grupoUsuarioService.listarTodos().subscribe({
-      next: (grupos) => {
+      next: (grupos: GrupoUsuario[]) => {
         this.grupos = grupos;
         this.isLoading = false;
         this.cdr.markForCheck();

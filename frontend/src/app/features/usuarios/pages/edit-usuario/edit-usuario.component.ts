@@ -26,7 +26,7 @@ import { UsuarioFormComponent } from '../../components/usuario-form/usuario-form
   standalone: true,
   imports: [CommonModule, UsuarioFormComponent],
   templateUrl: './edit-usuario.component.html',
-  styleUrls: ['./edit-usuario.component.scss'],
+  styleUrls: ['../../shared/styles/form-page.scss'],
 })
 export class EditUsuarioComponent implements OnInit {
 
@@ -102,12 +102,13 @@ export class EditUsuarioComponent implements OnInit {
     this.feedbackMessage = null;
 
     this.usuarioService.atualizar(this.usuario.id, payload).subscribe({
-      next: (usuario) => {
+      next: () => {
         this.isLoading = false;
         this.feedbackMessage = {
           tipo: 'success',
-          texto: `Usuário "${usuario.nome}" atualizado com sucesso!`,
+          texto: 'Usuário alterado com sucesso!',
         };
+        this.cdr.detectChanges();
 
         setTimeout(() => this.router.navigate(['/usuarios']), 2000);
       },
@@ -117,6 +118,7 @@ export class EditUsuarioComponent implements OnInit {
           tipo: 'error',
           texto: err.message || 'Erro ao atualizar usuário. Tente novamente.',
         };
+        this.cdr.detectChanges();
       },
     });
   }

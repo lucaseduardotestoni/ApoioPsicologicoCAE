@@ -1,11 +1,10 @@
 <div class="form-page">
   <div class="page-inner">
 
-    <!-- Header -->
     <div class="page-top">
       <div>
-        <h1 class="page-title">Registrar Atendimento</h1>
-        <p class="page-sub">Preencha os dados do atendimento realizado.</p>
+        <h1 class="page-title">Editar Atendimento</h1>
+        <p class="page-sub">Atualize os dados do registro.</p>
       </div>
       <a routerLink="/atendimentos" class="btn-back">
         <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
@@ -15,23 +14,31 @@
       </a>
     </div>
 
-    <!-- Feedback -->
     <div *ngIf="feedbackMessage" class="alert app-toast-top-right" [class.alert-success]="feedbackMessage.tipo === 'success'" [class.alert-error]="feedbackMessage.tipo === 'error'">
       <span class="alert-icon">{{ feedbackMessage.tipo === 'success' ? '✓' : '✕' }}</span>
       <span class="alert-text">{{ feedbackMessage.texto }}</span>
       <button class="alert-close" (click)="fecharFeedback()">×</button>
     </div>
 
-    <app-atendimento-form
-      [form]="form"
-      [estudantes]="estudantes"
-      [tipos]="tipos"
-      [isLoading]="isLoading"
-      [isLoadingEstudantes]="isLoadingEstudantes"
-      submitLabel="Registrar Atendimento"
-      (formSubmit)="onSubmit()"
-      (cancelar)="onCancelar()"
-    />
+    <ng-container *ngIf="!isLoadingPage; else loadingTemplate">
+      <app-atendimento-form
+        [form]="form"
+        [estudantes]="estudantes"
+        [tipos]="tipos"
+        [isLoading]="isSubmitting"
+        [isLoadingEstudantes]="isLoadingEstudantes"
+        submitLabel="Atualizar"
+        (formSubmit)="onSubmit()"
+        (cancelar)="onCancelar()"
+      />
+    </ng-container>
+
+    <ng-template #loadingTemplate>
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <span>Carregando atendimento...</span>
+      </div>
+    </ng-template>
 
   </div>
 </div>

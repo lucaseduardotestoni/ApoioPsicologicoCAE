@@ -3,12 +3,12 @@ import {
   ChangeDetectorRef,
   Component,
   OnInit,
-  ViewChild
+  ViewChild,
 } from '@angular/core';
-
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
 
 import { GrupoUsuario } from '../../../../core/models/grupo-usuario.model';
 import { GrupoUsuarioService } from '../../../../core/services/grupo-usuario.service';
@@ -24,23 +24,21 @@ interface Feedback {
   texto: string;
 }
 
+/**
+ * Página/Container de edição de grupo de usuário.
+ */
 @Component({
-  selector: 'app-create-grupo',
+  selector: 'app-edit-grupo',
   standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    GrupoFormComponent,
-    PermissaoListComponent
-  ],
-  templateUrl: './create-grupo.component.html',
+  imports: [CommonModule, FormsModule, GrupoFormComponent, PermissaoListComponent],
+  templateUrl: './edit-grupo.component.html',
   styleUrls: ['../../shared/styles/form-page.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CreateGrupoComponent implements OnInit {
+export class EditGrupoComponent implements OnInit {
   @ViewChild(GrupoFormComponent) private grupoFormComponent?: GrupoFormComponent;
 
-  readonly tituloTela = 'Novo Grupo';
+  readonly tituloTela = 'Editar Grupo';
 
   isLoadingDados = true;
   isSubmitting = false;
@@ -52,15 +50,42 @@ export class CreateGrupoComponent implements OnInit {
 
   feedbackMessage: Feedback | null = null;
 
+  private readonly grupoId: number;
+
   constructor(
-    private grupoUsuarioService: GrupoUsuarioService,
-    private permissaoService: PermissaoService,
-    private router: Router,
-    private cdr: ChangeDetectorRef
-  ) {}
+    private readonly grupoUsuarioService: GrupoUsuarioService,
+    private readonly permissaoService: PermissaoService,
+    private readonly router: Router,
+    private readonly route: ActivatedRoute,
+    private readonly cdr: ChangeDetectorRef
+  ) {
+    this.grupoId = Number(this.route.snapshot.paramMap.get('id'));
+  }
 
   async ngOnInit(): Promise<void> {
-    // Carrega permissões e níveis em paralelo
+    if (Number.isNaN(this.grupoId)) {
+      this.isLoadingDados = false;
+      this.feedbackMessage = { tipo: 'error', texto: 'ID inválido para edição de grupo.' };
+      this.cdr.markForCheck();
+      return;
+    }
+
+    await this.carregarGrupo();
+    this.carregarPermissoesENiveis();
+  }
+
+  private async carregarGrupo(): Promise<void> {
+    try {
+      const grupo = await firstValueFrom(this.grupoUsuarioService.buscarPorId(this.grupoId));
+      this.grupo = { ...grupo };
+    } catch {
+      this.feedbackMessage = { tipo: 'error', texto: 'Não foi possível carregar o grupo para edição.' };
+    } finally {
+      this.cdr.markForCheck();
+    }
+  }
+
+  private carregarPermissoesENiveis(): void {
     let permissoesCarregadas = false;
     let niveisCarregados = false;
 
@@ -71,17 +96,17 @@ export class CreateGrupoComponent implements OnInit {
       }
     };
 
-    this.permissaoService.listarPermissoes().subscribe(permissoes => {
-      this.permissaoRows = permissoes.map(p => ({
-        permissaoId: p.id,
-        nome: p.nome,
+    this.permissaoService.listarPermissoes().subscribe((permissoes) => {
+      this.permissaoRows = permissoes.map((permissao) => ({
+        permissaoId: permissao.id,
+        nome: permissao.nome,
         nivelPermissaoIdSelecionado: null,
       }));
       permissoesCarregadas = true;
       verificarConcluido();
     });
 
-    this.permissaoService.listarNiveis().subscribe(niveis => {
+    this.permissaoService.listarNiveis().subscribe((niveis) => {
       this.niveis = niveis;
       niveisCarregados = true;
       verificarConcluido();
@@ -103,14 +128,9 @@ export class CreateGrupoComponent implements OnInit {
     this.feedbackMessage = null;
     this.cdr.markForCheck();
 
-    const request$ = this.grupoUsuarioService.criar(this.grupo);
-
-    request$.subscribe({
+    this.grupoUsuarioService.atualizar(this.grupoId, this.grupo).subscribe({
       next: () => {
-        this.feedbackMessage = {
-          tipo: 'success',
-          texto: 'Grupo criado com sucesso!',
-        };
+        this.feedbackMessage = { tipo: 'success', texto: 'Grupo atualizado com sucesso!' };
         this.isSubmitting = false;
         this.cdr.markForCheck();
         setTimeout(() => this.router.navigate(['/grupos']), 1500);
@@ -123,8 +143,13 @@ export class CreateGrupoComponent implements OnInit {
     });
   }
 
-  onSalvar(): void { this.salvar(); }
-  onCancelar(): void { this.router.navigate(['/grupos']); }
+  onSalvar(): void {
+    this.salvar();
+  }
+
+  onCancelar(): void {
+    this.router.navigate(['/grupos']);
+  }
 
   onRowsChange(rows: PermissaoRow[]): void {
     this.permissaoRows = rows;

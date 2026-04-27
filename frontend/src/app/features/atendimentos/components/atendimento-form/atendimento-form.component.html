@@ -1,0 +1,70 @@
+<div class="card">
+  <form [formGroup]="form" (ngSubmit)="formSubmit.emit()" novalidate>
+
+    <div class="form-grid">
+
+      <div class="form-group span-2">
+        <label for="estudanteId">Estudante <span class="required">*</span></label>
+        <select id="estudanteId" formControlName="estudanteId" [class.input-error]="isInvalid('estudanteId')">
+          <option value="" disabled selected>
+            {{ isLoadingEstudantes ? 'Carregando...' : 'Selecione o estudante' }}
+          </option>
+          <option *ngFor="let e of estudantes" [value]="e.id">
+            {{ e.nome }} — {{ e.matricula }}
+          </option>
+        </select>
+        <span class="error-msg" *ngIf="isInvalid('estudanteId')">{{ getError('estudanteId') }}</span>
+      </div>
+
+      <div class="form-group">
+        <label for="data">Data do Atendimento <span class="required">*</span></label>
+        <input id="data" type="date" formControlName="data" [class.input-error]="isInvalid('data')" />
+        <span class="error-msg" *ngIf="isInvalid('data')">{{ getError('data') }}</span>
+      </div>
+
+      <div class="form-group">
+        <label for="tipo">Tipo de Atendimento <span class="required">*</span></label>
+        <select id="tipo" formControlName="tipo" [class.input-error]="isInvalid('tipo')">
+          <option value="" disabled selected>Selecione o tipo</option>
+          <option *ngFor="let t of tipos" [value]="t.value">{{ t.label }}</option>
+        </select>
+        <span class="error-msg" *ngIf="isInvalid('tipo')">{{ getError('tipo') }}</span>
+      </div>
+
+      <div class="form-group span-2">
+        <label for="responsavel">Responsável pelo Atendimento <span class="required">*</span></label>
+        <input id="responsavel" type="text" formControlName="responsavel" placeholder="Nome do profissional responsável" [class.input-error]="isInvalid('responsavel')" />
+        <span class="error-msg" *ngIf="isInvalid('responsavel')">{{ getError('responsavel') }}</span>
+      </div>
+
+      <div class="form-group span-2">
+        <label for="descricao">
+          Descrição do Atendimento <span class="required">*</span>
+          <span class="char-count">{{ form.get('descricao')?.value?.length || 0 }}/2000</span>
+        </label>
+        <textarea id="descricao" formControlName="descricao" rows="5" placeholder="Descreva o atendimento realizado, principais pontos abordados e encaminhamentos..." [class.input-error]="isInvalid('descricao')"></textarea>
+        <span class="error-msg" *ngIf="isInvalid('descricao')">{{ getError('descricao') }}</span>
+      </div>
+
+      <div class="form-group span-2">
+        <label for="observacoes">
+          Observações
+          <span class="optional">(opcional)</span>
+        </label>
+        <textarea id="observacoes" formControlName="observacoes" rows="3" placeholder="Informações adicionais, próximos passos, encaminhamentos..."></textarea>
+      </div>
+
+    </div>
+
+    <div class="actions">
+      <button type="button" class="btn btn-secondary" (click)="cancelar.emit()" [disabled]="isLoading">
+        Cancelar
+      </button>
+      <button type="submit" class="btn btn-primary" [disabled]="isLoading">
+        <span *ngIf="isLoading" class="spinner"></span>
+        {{ isLoading ? 'Salvando...' : submitLabel }}
+      </button>
+    </div>
+
+  </form>
+</div>

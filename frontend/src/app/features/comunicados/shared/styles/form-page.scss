@@ -1,0 +1,132 @@
+$blue: #1565c0;
+$blue-dark: #0d47a1;
+$muted: #757575;
+$bg: #f5f6fa;
+$danger: #d32f2f;
+$success: #2e7d32;
+
+.form-page {
+  background: $bg;
+  min-height: calc(100vh - 63px - 44px);
+}
+.page-inner {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 28px 16px;
+}
+
+// Header
+.page-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.page-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: $blue-dark;
+  margin-bottom: 4px;
+}
+.page-sub {
+  font-size: 13px;
+  color: $muted;
+}
+
+.btn-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 7px;
+  font-size: 13px;
+  font-weight: 600;
+  color: $blue;
+  border: 1.5px solid rgba($blue, 0.3);
+  text-decoration: none;
+  transition: background 0.15s;
+  &:hover {
+    background: rgba($blue, 0.06);
+  }
+}
+
+// Alert
+.alert {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+}
+.alert-success {
+  background: rgba($success, 0.1);
+  color: darken($success, 5%);
+  border: 1px solid rgba($success, 0.3);
+}
+.alert-error {
+  background: rgba($danger, 0.1);
+  color: darken($danger, 5%);
+  border: 1px solid rgba($danger, 0.3);
+}
+.alert-icon {
+  font-weight: 800;
+  font-size: 16px;
+}
+.alert-text {
+  flex: 1;
+}
+.alert-close {
+  margin-left: auto;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: inherit;
+  opacity: 0.7;
+  padding: 0 4px;
+  &:hover {
+    opacity: 1;
+  }
+}
+
+// Card
+.card {
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  padding: 28px;
+}
+
+// Loading
+.loading-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 60px;
+  color: $muted;
+  font-size: 14px;
+}
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba($blue, 0.2);
+  border-top-color: $blue;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 600px) {
+  .page-inner {
+    padding: 16px 8px;
+  }
+}

@@ -4,10 +4,8 @@
     <!-- Header -->
     <div class="page-top">
       <div>
-        <h1 class="page-title">{{ isEditMode ? 'Editar Comunicado' : 'Novo Comunicado' }}</h1>
-        <p class="page-sub">
-          {{ isEditMode ? 'Atualize as informações do comunicado.' : 'Preencha os dados para criar um novo comunicado.' }}
-        </p>
+        <h1 class="page-title">Novo Comunicado</h1>
+        <p class="page-sub">Preencha os dados para criar um novo comunicado.</p>
       </div>
       <a routerLink="/comunicados" class="btn-back">
         <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
@@ -17,16 +15,15 @@
       </a>
     </div>
 
-    <!-- Loading inicial (modo edição) -->
-    <div *ngIf="isEditMode && loading && !comunicado" class="loading-state">
-      <div class="spinner"></div>
-      <span>Carregando comunicado...</span>
+    <div *ngIf="feedbackMessage" class="alert app-toast-top-right" [class.alert-success]="feedbackMessage.tipo === 'success'" [class.alert-error]="feedbackMessage.tipo === 'error'">
+      <span class="alert-icon">{{ feedbackMessage.tipo === 'success' ? '✓' : '✕' }}</span>
+      <span class="alert-text">{{ feedbackMessage.texto }}</span>
+      <button class="alert-close" (click)="fecharFeedback()">×</button>
     </div>
 
     <!-- Card do formulário -->
-    <div class="card" *ngIf="!isEditMode || comunicado">
+    <div class="card">
       <app-comunicado-form
-        [comunicado]="comunicado"
         [grupos]="grupos"
         [loading]="loading"
         (formSubmit)="onFormSubmit($event)"

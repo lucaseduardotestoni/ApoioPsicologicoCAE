@@ -2,7 +2,7 @@
 
   <!-- HEADER compartilhado layout\shell -->
 
-<main class="page-main">
+  <main class="page-main">
 
     <!-- Breadcrumb -->
     <nav class="breadcrumb">
@@ -37,7 +37,7 @@
           </div>
           <div>
             <div class="card-title">Dados do Grupo</div>
-            <div class="card-sub">Defina o nome que identificará este grupo no sistema.</div>
+            <div class="card-sub">Atualize o nome que identifica este grupo no sistema.</div>
           </div>
         </div>
         <div class="card-body">
@@ -77,11 +77,11 @@
         </button>
         <button type="button" class="btn btn-primary" (click)="onSalvar()" [disabled]="isSubmitting">
           <span *ngIf="isSubmitting" class="spinner"></span>
-          {{ isSubmitting ? 'Salvando...' : 'Cadastrar Grupo' }}
+          {{ isSubmitting ? 'Salvando...' : 'Salvar Alterações' }}
         </button>
       </div>
 
     </ng-container>
   </main>
- <!-- ── footer compartilhado layout\shell ────────────────────────────────────────── -->
+  <!-- ── footer compartilhado layout\shell ────────────────────────────────────────── -->
 </div>

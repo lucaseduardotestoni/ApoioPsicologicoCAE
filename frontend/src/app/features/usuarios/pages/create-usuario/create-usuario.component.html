@@ -3,13 +3,10 @@
   Este container orquestra os dados e delega o formulário ao componente filho.
 -->
 <div class="page-wrapper">
-
   <!-- ── HEADER compartilhado layout\shell ─────────────────────────────── -->
-
 
   <!-- ── CORPO ────────────────────────────────────────── -->
   <main class="page-main">
-
     <!-- Breadcrumb -->
     <nav class="breadcrumb">
       <span class="breadcrumb-item">Usuários</span>
@@ -17,34 +14,34 @@
       <span class="breadcrumb-item active">{{ breadcrumbAtual }}</span>
     </nav>
 
+    <!-- Feedback de sucesso/erro -->
+    <div *ngIf="feedbackMessage" class="alert app-toast-top-right" [class.alert-success]="feedbackMessage.tipo === 'success'" [class.alert-error]="feedbackMessage.tipo === 'error'">
+      <span class="alert-icon">{{ feedbackMessage.tipo === 'success' ? '✓' : '✕' }}</span>
+      <span class="alert-text">{{ feedbackMessage.texto }}</span>
+      <button class="alert-close" (click)="fecharFeedback()">×</button>
+    </div>
+
     <!-- Card principal -->
     <div class="card">
-
       <!-- Título do card -->
       <div class="card-header">
         <div class="card-title-icon">
-          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor" width="20" height="20">
-            <path d="M15 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-9-2V7H4v3H1v2h3v3h2v-3h3v-2H6zm9 4c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+          <svg
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="currentColor"
+            width="20"
+            height="20"
+          >
+            <path
+              d="M15 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-9-2V7H4v3H1v2h3v3h2v-3h3v-2H6zm9 4c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"
+            />
           </svg>
         </div>
         <div>
           <h1 class="card-title">{{ tituloPagina }}</h1>
           <p class="card-subtitle">{{ subtituloPagina }}</p>
         </div>
-      </div>
-
-      <!-- Feedback de sucesso/erro -->
-      <div
-        *ngIf="feedbackMessage"
-        class="alert"
-        [class.alert-success]="feedbackMessage.tipo === 'success'"
-        [class.alert-error]="feedbackMessage.tipo === 'error'"
-      >
-        <span class="alert-icon">
-          {{ feedbackMessage.tipo === 'success' ? '✓' : '✕' }}
-        </span>
-        <span class="alert-text">{{ feedbackMessage.texto }}</span>
-        <button class="alert-close" (click)="fecharFeedback()">×</button>
       </div>
 
       <!-- Loading de grupos -->
@@ -61,7 +58,6 @@
         (formSubmit)="onFormSubmit($event)"
         (cancelar)="onCancelar()"
       />
-
     </div>
   </main>
   <!-- ── footer compartilhado layout\shell ────────────────────────────────────────── -->

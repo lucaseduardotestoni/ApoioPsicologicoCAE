@@ -53,7 +53,7 @@ export const routes: Routes = [
       {
         path: 'grupos/editar/:id',
         loadComponent: () =>
-          import('./features/grupos-usuario/pages/create-grupo/create-grupo.component').then(m => m.CreateGrupoComponent),
+          import('./features/grupos-usuario/pages/edit-grupo/edit-grupo.component').then(m => m.EditGrupoComponent),
       },
 
       // ── Comunicados ───────────────────────────────────────────
@@ -70,7 +70,7 @@ export const routes: Routes = [
       {
         path: 'comunicados/editar/:id',
         loadComponent: () =>
-          import('./features/comunicados/pages/create-comunicado/create-comunicado.component').then(m => m.CreateComunicadoComponent),
+          import('./features/comunicados/pages/edit-comunicado/edit-comunicado.component').then(m => m.EditComunicadoComponent),
       },
       {
         path: 'comunicados/:id',
@@ -87,12 +87,12 @@ export const routes: Routes = [
       {
         path: 'agenda-cae/novo',
         loadComponent: () =>
-          import('./features/agenda-cae/pages/agenda-form/agenda-form.component').then(m => m.AgendaFormComponent),
+          import('./features/agenda-cae/pages/create-agenda/create-agenda.component').then(m => m.CreateAgendaComponent),
       },
       {
         path: 'agenda-cae/editar/:id',
         loadComponent: () =>
-          import('./features/agenda-cae/pages/agenda-form/agenda-form.component').then(m => m.AgendaFormComponent),
+          import('./features/agenda-cae/pages/edit-agenda/edit-agenda.component').then(m => m.EditAgendaComponent),
       },
       {
         path: 'agenda-cae/detalhes',
@@ -114,7 +114,7 @@ export const routes: Routes = [
       {
         path: 'atendimentos/editar/:id',
         loadComponent: () =>
-          import('./features/atendimentos/pages/create-atendimento/create-atendimento.component').then(m => m.CreateAtendimentoComponent),
+          import('./features/atendimentos/pages/edit-atendimento/edit-atendimento.component').then(m => m.EditAtendimentoComponent),
       },
       {
         path: 'atendimentos/prontuario',

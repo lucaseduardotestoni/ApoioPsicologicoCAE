@@ -17,6 +17,13 @@
       <span class="breadcrumb-item active">{{ breadcrumbAtual }}</span>
     </nav>
 
+    <!-- Feedback de sucesso/erro -->
+    <div      *ngIf="feedbackMessage" class="alert app-toast-top-right" [class.alert-success]="feedbackMessage.tipo === 'success'" [class.alert-error]="feedbackMessage.tipo === 'error'">
+      <span class="alert-icon">{{ feedbackMessage.tipo === 'success' ? '✓' : '✕' }}</span>
+      <span class="alert-text">{{ feedbackMessage.texto }}</span>
+      <button class="alert-close" (click)="fecharFeedback()">×</button>
+    </div>
+
     <!-- Card principal -->
     <div class="card">
 
@@ -31,20 +38,6 @@
           <h1 class="card-title">{{ tituloPagina }}</h1>
           <p class="card-subtitle">{{ subtituloPagina }}</p>
         </div>
-      </div>
-
-      <!-- Feedback de sucesso/erro -->
-      <div
-        *ngIf="feedbackMessage"
-        class="alert"
-        [class.alert-success]="feedbackMessage.tipo === 'success'"
-        [class.alert-error]="feedbackMessage.tipo === 'error'"
-      >
-        <span class="alert-icon">
-          {{ feedbackMessage.tipo === 'success' ? '✓' : '✕' }}
-        </span>
-        <span class="alert-text">{{ feedbackMessage.texto }}</span>
-        <button class="alert-close" (click)="fecharFeedback()">×</button>
       </div>
 
       <!-- Loading de grupos ou usuário -->

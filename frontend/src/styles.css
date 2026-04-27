@@ -1,1 +1,22 @@
 /* You can add global styles to this file, and also import other style files */
+
+.app-toast-top-right {
+	position: fixed;
+	top: 84px;
+	right: 24px;
+	z-index: 1200;
+	width: max-content;
+	max-width: min(440px, calc(100vw - 32px));
+	margin: 0 !important;
+	box-shadow: 0 10px 24px rgba(0, 0, 0, 0.16);
+}
+
+@media (max-width: 600px) {
+	.app-toast-top-right {
+		top: 72px;
+		left: 12px;
+		right: 12px;
+		width: auto;
+		max-width: none;
+	}
+}

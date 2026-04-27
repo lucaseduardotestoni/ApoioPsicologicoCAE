@@ -14,7 +14,7 @@ import { UsuarioFormComponent } from '../../components/usuario-form/usuario-form
   standalone: true,
   imports: [CommonModule, UsuarioFormComponent],
   templateUrl: './create-usuario.component.html',
-  styleUrls: ['./create-usuario.component.scss'],
+  styleUrls: ['../../shared/styles/form-page.scss'],
 })
 export class CreateUsuarioComponent implements OnInit {
   grupos: GrupoUsuario[] = [];
@@ -71,12 +71,13 @@ export class CreateUsuarioComponent implements OnInit {
     };
 
     this.usuarioService.criar(createPayload).subscribe({
-      next: (usuario) => {
+      next: () => {
         this.isLoading = false;
         this.feedbackMessage = {
           tipo: 'success',
-          texto: `Usuário "${usuario.nome}" cadastrado com sucesso!`,
+          texto: 'Usuário criado com sucesso!',
         };
+        this.cdr.detectChanges();
 
         setTimeout(() => this.router.navigate(['/usuarios']), 2000);
       },
@@ -86,6 +87,7 @@ export class CreateUsuarioComponent implements OnInit {
           tipo: 'error',
           texto: err.message || 'Erro ao cadastrar usuário. Tente novamente.',
         };
+        this.cdr.detectChanges();
       },
     });
   }

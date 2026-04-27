@@ -6,13 +6,13 @@ import {
   OnInit,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 
 import { ComunicadoFormComponent } from '../../components/comunicado-form/comunicado-form.component';
 import { ComunicadoService } from '../../../../core/services/comunicado.service';
 import { GrupoUsuarioService } from '../../../../core/services/grupo-usuario.service';
-import { Comunicado, CreateComunicadoPayload } from '../../../../core/models/comunicado.model';
+import { CreateComunicadoPayload } from '../../../../core/models/comunicado.model';
 import { GrupoUsuario } from '../../../../core/models/grupo-usuario.model';
 
 @Component({
@@ -24,22 +24,20 @@ import { GrupoUsuario } from '../../../../core/models/grupo-usuario.model';
     ComunicadoFormComponent,
   ],
   templateUrl: './create-comunicado.component.html',
-  styleUrls: ['./create-comunicado.component.scss'],
+  styleUrls: ['../../shared/styles/form-page.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CreateComunicadoComponent implements OnInit, OnDestroy {
 
-  comunicado: Comunicado | null = null;
   grupos: GrupoUsuario[] = [];
   loading = false;
-  isEditMode = false;
+  feedbackMessage: { tipo: 'success' | 'error'; texto: string } | null = null;
 
   private destroy$ = new Subject<void>();
 
   constructor(
     private comunicadoService: ComunicadoService,
     private grupoService: GrupoUsuarioService,
-    private route: ActivatedRoute,
     private router: Router,
     private cdr: ChangeDetectorRef
   ) {}
@@ -52,48 +50,41 @@ export class CreateComunicadoComponent implements OnInit, OnDestroy {
         this.grupos = grupos;
         this.cdr.markForCheck();
       });
-
-    const id = this.route.snapshot.paramMap.get('id');
-    if (id) {
-      this.isEditMode = true;
-      this.loading = true;
-
-      this.comunicadoService
-        .getById(Number(id))
-        .pipe(takeUntil(this.destroy$))
-        .subscribe({
-          next: (c: Comunicado) => {
-            if (!c) { this.voltar(); return; }
-            this.comunicado = c;
-            this.loading = false;
-            this.cdr.markForCheck();
-          },
-          error: () => {
-            this.loading = false;
-            this.cdr.markForCheck();
-          },
-        });
-    }
   }
 
   onFormSubmit(payload: CreateComunicadoPayload): void {
     this.loading = true;
+    this.feedbackMessage = null;
     this.cdr.markForCheck();
 
-    const request$ = this.isEditMode && this.comunicado
-      ? this.comunicadoService.update(this.comunicado.id!, payload)
-      : this.comunicadoService.create(payload);
+    const request$ = this.comunicadoService.create(payload);
 
     request$.pipe(takeUntil(this.destroy$)).subscribe({
-      next: () => { this.voltar(); },
+      next: () => {
+        this.loading = false;
+        this.feedbackMessage = {
+          tipo: 'success',
+          texto: 'Comunicado criado com sucesso!',
+        };
+        this.cdr.markForCheck();
+        setTimeout(() => this.voltar(), 1800);
+      },
       error: () => {
         this.loading = false;
+        this.feedbackMessage = {
+          tipo: 'error',
+          texto: 'Erro ao salvar comunicado.',
+        };
         this.cdr.markForCheck();
       },
     });
   }
 
   onCancelar(): void { this.voltar(); }
+
+  fecharFeedback(): void {
+    this.feedbackMessage = null;
+  }
 
   private voltar(): void {
     this.router.navigate(['/comunicados']);
