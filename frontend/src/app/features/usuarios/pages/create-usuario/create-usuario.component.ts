@@ -1,24 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { firstValueFrom, timeout } from 'rxjs';
 
 import { GrupoUsuario } from '../../../../core/models/grupo-usuario.model';
-import { CreateUsuarioPayload } from '../../../../core/models/usuario.model';
+import { CreateUsuarioPayload, UsuarioFormPayload } from '../../../../core/models/usuario.model';
 import { GrupoUsuarioService } from '../../../../core/services/grupo-usuario.service';
 import { UsuarioService } from '../../../../core/services/usuario.service';
 import { UsuarioFormComponent } from '../../components/usuario-form/usuario-form.component';
 
-/**
- * Página/Container de criação de usuário.
- *
- * Responsabilidades:
- *  - Carregar dados necessários (grupos) para o formulário
- *  - Orquestrar chamada ao service de criação
- *  - Exibir feedback (sucesso/erro) ao usuário
- *  - Redirecionar após criação bem-sucedida
- *
- * NÃO contém lógica de formulário — delegada ao UsuarioFormComponent.
- */
 @Component({
   selector: 'app-create-usuario',
   standalone: true,
@@ -27,49 +17,60 @@ import { UsuarioFormComponent } from '../../components/usuario-form/usuario-form
   styleUrls: ['./create-usuario.component.scss'],
 })
 export class CreateUsuarioComponent implements OnInit {
-
   grupos: GrupoUsuario[] = [];
+  readonly tituloPagina = 'Cadastrar Usuário';
+  readonly subtituloPagina = 'Preencha os dados para criar um novo acesso ao sistema.';
+  readonly breadcrumbAtual = 'Novo Usuário';
+
   isLoading = false;
   isLoadingGrupos = true;
 
-  /** Mensagem de feedback exibida após operação */
   feedbackMessage: { tipo: 'success' | 'error'; texto: string } | null = null;
 
   constructor(
-    private grupoService: GrupoUsuarioService,
-    private usuarioService: UsuarioService,
-    private router: Router
+    private readonly grupoUsuarioService: GrupoUsuarioService,
+    private readonly usuarioService: UsuarioService,
+    private readonly router: Router,
+    private readonly cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
-    this.carregarGrupos();
+    void this.carregarGrupos();
   }
 
-  private carregarGrupos(): void {
+  private async carregarGrupos(): Promise<void> {
     this.isLoadingGrupos = true;
-    this.grupoService.listarTodos().subscribe({
-      next: (grupos) => {
-        this.grupos = grupos;
-        this.isLoadingGrupos = false;
-      },
-      error: () => {
-        this.feedbackMessage = {
-          tipo: 'error',
-          texto: 'Erro ao carregar grupos de usuário. Tente recarregar a página.',
-        };
-        this.isLoadingGrupos = false;
-      },
-    });
+    this.feedbackMessage = null;
+
+    try {
+      this.grupos = await firstValueFrom(
+        this.grupoUsuarioService.listarTodos().pipe(timeout(10000))
+      );
+    } catch {
+      this.grupos = [];
+      this.feedbackMessage = {
+        tipo: 'error',
+        texto: 'Erro ao carregar grupos de usuário. Tente recarregar a página.',
+      };
+    } finally {
+      this.isLoadingGrupos = false;
+      this.cdr.detectChanges();
+    }
   }
 
-  /**
-   * Recebe o payload do componente filho e chama o service.
-   */
-  onFormSubmit(payload: CreateUsuarioPayload): void {
+  onFormSubmit(payload: UsuarioFormPayload): void {
     this.isLoading = true;
     this.feedbackMessage = null;
 
-    this.usuarioService.criar(payload).subscribe({
+    const createPayload: CreateUsuarioPayload = {
+      nome: payload.nome,
+      senha: payload.senha ?? '',
+      grupoUsuarioId: payload.grupoUsuarioId,
+      mudaSenha: payload.mudaSenha,
+      status: payload.status,
+    };
+
+    this.usuarioService.criar(createPayload).subscribe({
       next: (usuario) => {
         this.isLoading = false;
         this.feedbackMessage = {
@@ -77,8 +78,6 @@ export class CreateUsuarioComponent implements OnInit {
           texto: `Usuário "${usuario.nome}" cadastrado com sucesso!`,
         };
 
-        // Redireciona após 2 segundos para a listagem
-        // Ajuste a rota conforme seu módulo de roteamento
         setTimeout(() => this.router.navigate(['/usuarios']), 2000);
       },
       error: (err: Error) => {

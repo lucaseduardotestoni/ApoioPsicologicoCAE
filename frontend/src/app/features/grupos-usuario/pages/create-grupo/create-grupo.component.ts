@@ -2,12 +2,14 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
-  OnInit
+  OnInit,
+  ViewChild
 } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
 
 import { GrupoUsuario } from '../../../../core/models/grupo-usuario.model';
 import { GrupoUsuarioService } from '../../../../core/services/grupo-usuario.service';
@@ -37,6 +39,7 @@ interface Feedback {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CreateGrupoComponent implements OnInit {
+  @ViewChild(GrupoFormComponent) private grupoFormComponent?: GrupoFormComponent;
 
   tituloTela = 'Novo Grupo';
 
@@ -53,23 +56,36 @@ export class CreateGrupoComponent implements OnInit {
   feedback: Feedback | null = null;
 
   constructor(
-    private grupoService: GrupoUsuarioService,
+    private grupoUsuarioService: GrupoUsuarioService,
     private permissaoService: PermissaoService,
     private router: Router,
     private route: ActivatedRoute,
     private cdr: ChangeDetectorRef
   ) {}
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     // Verifica modo edição
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
+      const grupoId = Number(id);
+      if (Number.isNaN(grupoId)) {
+        this.feedback = { tipo: 'error', texto: 'ID inválido para edição de grupo.' };
+      }
+
       this.modoEdicao = true;
       this.tituloTela = 'Editar Grupo';
-      const grupo = this.grupoService.buscarPorId(Number(id));
-      if (grupo) {
-        this.grupoParaEditar = grupo;
-        this.grupo = { ...grupo };
+      if (!Number.isNaN(grupoId)) {
+        try {
+          const grupo = await firstValueFrom(this.grupoUsuarioService.buscarPorId(grupoId));
+          if (grupo) {
+            this.grupoParaEditar = grupo;
+            this.grupo = { ...grupo };
+          }
+        } catch {
+          this.feedback = { tipo: 'error', texto: 'Não foi possível carregar o grupo para edição.' };
+        } finally {
+          this.cdr.markForCheck();
+        }
       }
     }
 
@@ -102,19 +118,23 @@ export class CreateGrupoComponent implements OnInit {
   }
 
   salvar(): void {
-    if (!this.grupo.nome) {
+    this.grupoFormComponent?.markAllTouched();
+
+    if (!this.grupoFormComponent?.isValid()) {
       this.feedback = { tipo: 'error', texto: 'Informe o nome do grupo.' };
       this.cdr.markForCheck();
       return;
     }
+
+    this.grupo = this.grupoFormComponent.getPayload();
 
     this.isSubmitting = true;
     this.feedback = null;
     this.cdr.markForCheck();
 
     const request$ = this.modoEdicao && this.grupoParaEditar?.id
-      ? this.grupoService.atualizar(this.grupoParaEditar.id, this.grupo)
-      : this.grupoService.criar(this.grupo);
+      ? this.grupoUsuarioService.atualizar(this.grupoParaEditar.id, this.grupo)
+      : this.grupoUsuarioService.criar(this.grupo);
 
     request$.subscribe({
       next: () => {
@@ -136,10 +156,6 @@ export class CreateGrupoComponent implements OnInit {
 
   onSalvar(): void { this.salvar(); }
   onCancelar(): void { this.router.navigate(['/grupos']); }
-
-  onNomeChange(nome: string | null): void {
-    this.grupo.nome = nome ?? '';
-  }
 
   onRowsChange(rows: PermissaoRow[]): void {
     this.permissaoRows = rows;

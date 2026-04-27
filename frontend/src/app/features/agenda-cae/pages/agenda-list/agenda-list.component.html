@@ -2,7 +2,6 @@
 
   <div class="page-inner">
 
-    <!-- TOPO -->
     <div class="page-top">
       <div>
         <h2 class="page-title">Agenda CAE</h2>
@@ -14,9 +13,15 @@
       </button>
     </div>
 
-    <!-- TABELA -->
-    <div class="card">
+    <div *ngIf="isLoading" class="loading-state">
+      <div class="spinner"></div> Carregando horários...
+    </div>
 
+    <div *ngIf="!isLoading && errorMessage" class="empty">
+      {{ errorMessage }}
+    </div>
+
+    <div *ngIf="!isLoading && !errorMessage" class="card">
       <table class="data-table">
 
         <thead>
@@ -31,10 +36,8 @@
         </thead>
 
         <tbody>
-
-          <tr *ngFor="let h of service.horarios$ | async">
-
-            <td class="td-bold">{{ h.data }}</td>
+          <tr *ngFor="let h of horarios">
+            <td class="td-bold">{{ h.data | date:'dd/MM/yyyy' }}</td>
             <td>{{ h.horaInicio }}</td>
             <td>{{ h.horaFim }}</td>
 
@@ -49,16 +52,17 @@
             </td>
 
             <td class="col-actions">
-              <a class="action-btn" (click)="editar(h.id)">Editar</a>
-              <a class="action-btn" (click)="excluir(h.id)">Excluir</a>
+              <a class="action-btn" (click)="editar(h.id)" style="cursor:pointer">Editar</a>
+              <a class="action-btn" (click)="excluir(h.id)" style="cursor:pointer">Excluir</a>
             </td>
-
           </tr>
 
+          <tr *ngIf="horarios.length === 0">
+            <td colspan="6" class="empty">Nenhum horário cadastrado.</td>
+          </tr>
         </tbody>
 
       </table>
-
     </div>
 
   </div>

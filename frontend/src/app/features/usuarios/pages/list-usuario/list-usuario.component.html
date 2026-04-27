@@ -16,7 +16,11 @@
       <div class="spinner"></div> Carregando...
     </div>
 
-    <div *ngIf="!isLoading" class="card">
+    <div *ngIf="!isLoading && errorMessage" class="empty">
+      {{ errorMessage }}
+    </div>
+
+    <div *ngIf="!isLoading && !errorMessage" class="card">
       <table class="data-table">
         <thead>
           <tr>

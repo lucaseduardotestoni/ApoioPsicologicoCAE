@@ -23,39 +23,38 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProntuarioComponent {
-  // Busca
   termoBusca = '';
   resultadosBusca: Estudante[] = [];
   buscando = false;
   buscaRealizada = false;
+  buscaErro: string | null = null;
 
-  // Estudante selecionado
   estudanteSelecionado: Estudante | null = null;
   atendimentos: RegistroAtendimento[] = [];
   carregandoAtendimentos = false;
+  atendimentosErro: string | null = null;
 
-  // Expansão de itens
   expandidos = new Set<number>();
 
   readonly tipoLabels: Record<TipoAtendimento, string> = {
     PSICOLOGICO: 'Psicológico',
-    SOCIAL:      'Social',
-    PEDAGOGICO:  'Pedagógico',
-    ORIENTACAO:  'Orientação',
-    OUTRO:       'Outro',
+    SOCIAL: 'Social',
+    PEDAGOGICO: 'Pedagógico',
+    ORIENTACAO: 'Orientação',
+    OUTRO: 'Outro',
   };
 
   readonly tipoCores: Record<TipoAtendimento, string> = {
     PSICOLOGICO: '#1565C0',
-    SOCIAL:      '#00897B',
-    PEDAGOGICO:  '#5C6BC0',
-    ORIENTACAO:  '#F9A825',
-    OUTRO:       '#757575',
+    SOCIAL: '#00897B',
+    PEDAGOGICO: '#5C6BC0',
+    ORIENTACAO: '#F9A825',
+    OUTRO: '#757575',
   };
 
   constructor(
-    private service: AtendimentoService,
-    private cdr: ChangeDetectorRef
+    private readonly service: AtendimentoService,
+    private readonly cdr: ChangeDetectorRef
   ) {}
 
   onBuscar(): void {
@@ -64,15 +63,27 @@ export class ProntuarioComponent {
 
     this.buscando = true;
     this.buscaRealizada = false;
+    this.buscaErro = null;
     this.estudanteSelecionado = null;
     this.atendimentos = [];
+    this.atendimentosErro = null;
+    this.resultadosBusca = [];
     this.cdr.markForCheck();
 
-    this.service.buscarEstudantes(termo).subscribe(lista => {
-      this.resultadosBusca = lista;
-      this.buscando = false;
-      this.buscaRealizada = true;
-      this.cdr.markForCheck();
+    this.service.buscarEstudantes(termo).subscribe({
+      next: (lista) => {
+        this.resultadosBusca = lista;
+        this.buscando = false;
+        this.buscaRealizada = true;
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.resultadosBusca = [];
+        this.buscando = false;
+        this.buscaRealizada = true;
+        this.buscaErro = 'Erro ao buscar estudantes.';
+        this.cdr.markForCheck();
+      },
     });
   }
 
@@ -83,13 +94,23 @@ export class ProntuarioComponent {
   selecionarEstudante(estudante: Estudante): void {
     this.estudanteSelecionado = estudante;
     this.carregandoAtendimentos = true;
+    this.atendimentosErro = null;
+    this.atendimentos = [];
     this.expandidos.clear();
     this.cdr.markForCheck();
 
-    this.service.listarPorEstudante(estudante.id).subscribe(lista => {
-      this.atendimentos = lista;
-      this.carregandoAtendimentos = false;
-      this.cdr.markForCheck();
+    this.service.listarPorEstudante(estudante.id).subscribe({
+      next: (lista) => {
+        this.atendimentos = lista;
+        this.carregandoAtendimentos = false;
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.atendimentos = [];
+        this.carregandoAtendimentos = false;
+        this.atendimentosErro = 'Erro ao carregar histórico de atendimentos.';
+        this.cdr.markForCheck();
+      },
     });
   }
 
@@ -109,9 +130,11 @@ export class ProntuarioComponent {
   limparSelecao(): void {
     this.estudanteSelecionado = null;
     this.atendimentos = [];
+    this.atendimentosErro = null;
     this.termoBusca = '';
     this.resultadosBusca = [];
     this.buscaRealizada = false;
+    this.buscaErro = null;
     this.cdr.markForCheck();
   }
 

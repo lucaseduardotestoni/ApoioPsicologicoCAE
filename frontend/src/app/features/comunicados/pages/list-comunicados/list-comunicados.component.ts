@@ -5,7 +5,6 @@ import { FormsModule } from '@angular/forms';
 import { Comunicado } from '../../../../core/models/comunicado.model';
 import { ComunicadoService } from '../../../../core/services/comunicado.service';
 
-// Componente de listagem de comunicados
 @Component({
   selector: 'app-list-comunicados',
   standalone: true,
@@ -15,47 +14,53 @@ import { ComunicadoService } from '../../../../core/services/comunicado.service'
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ListComunicadosComponent implements OnInit {
+  comunicados: Comunicado[] = [];
+  comunicadosFiltrados: Comunicado[] = [];
+  isLoading = true;
+  errorMessage: string | null = null;
 
-  comunicados: Comunicado[] = []; // lista original
-  comunicadosFiltrados: Comunicado[] = []; // lista com filtros aplicados
-  isLoading = true; // controle de loading
-
-  // Filtros 
-  filtroStatus: 'todos' | 'ativo' | 'inativo' = 'todos'; 
-  buscaTitulo = ''; 
+  filtroStatus: 'todos' | 'ativo' | 'inativo' = 'todos';
+  buscaTitulo = '';
 
   constructor(
-    private service: ComunicadoService,
-    private cdr: ChangeDetectorRef,
+    private readonly service: ComunicadoService,
+    private readonly cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
-    this.carregarComunicados(); // carrega dados ao iniciar
+    this.carregarComunicados();
   }
 
   private carregarComunicados(): void {
     this.isLoading = true;
+    this.errorMessage = null;
 
-    // busca todos comunicados
-    this.service.listarTodos().subscribe(lista => {
-      this.comunicados = lista;
-      this.aplicarFiltros(); // aplica filtros após carregar
-      this.isLoading = false;
-      this.cdr.markForCheck();
+    this.service.listarTodos().subscribe({
+      next: (lista) => {
+        this.comunicados = lista;
+        this.aplicarFiltros();
+        this.isLoading = false;
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.comunicados = [];
+        this.comunicadosFiltrados = [];
+        this.errorMessage = 'Erro ao carregar comunicados da API.';
+        this.isLoading = false;
+        this.cdr.markForCheck();
+      },
     });
   }
 
   aplicarFiltros(): void {
     let resultado = [...this.comunicados];
 
-    // filtro por status
-    if (this.filtroStatus === 'ativo') resultado = resultado.filter(c => c.ativo);
-    if (this.filtroStatus === 'inativo') resultado = resultado.filter(c => !c.ativo);
+    if (this.filtroStatus === 'ativo') resultado = resultado.filter((c) => c.ativo);
+    if (this.filtroStatus === 'inativo') resultado = resultado.filter((c) => !c.ativo);
 
-    // filtro por título
     if (this.buscaTitulo.trim()) {
       const termo = this.buscaTitulo.toLowerCase();
-      resultado = resultado.filter(c => c.titulo.toLowerCase().includes(termo));
+      resultado = resultado.filter((c) => c.titulo.toLowerCase().includes(termo));
     }
 
     this.comunicadosFiltrados = resultado;
@@ -63,31 +68,31 @@ export class ListComunicadosComponent implements OnInit {
   }
 
   onToggleAtivo(com: Comunicado, event: Event): void {
-    event.stopPropagation(); // evita trigger de clique na linha
+    event.stopPropagation();
 
     const acao = com.ativo ? 'desativar' : 'ativar';
-
-    // confirmação antes de alterar status
     if (!confirm(`Deseja ${acao} o comunicado "${com.titulo}"?`)) return;
 
-    this.service.toggleAtivo(com.id!).subscribe(() => {
-      this.carregarComunicados(); // recarrega lista após alteração
+    this.service.toggleAtivo(com.id!).subscribe({
+      next: () => this.carregarComunicados(),
+      error: () => {
+        this.errorMessage = 'Erro ao atualizar o status do comunicado.';
+        this.cdr.markForCheck();
+      },
     });
   }
 
   limparFiltros(): void {
     this.filtroStatus = 'todos';
     this.buscaTitulo = '';
-    this.aplicarFiltros(); // reseta filtros
+    this.aplicarFiltros();
   }
 
-  // total de comunicados ativos
   get totalAtivos(): number {
-    return this.comunicados.filter(c => c.ativo).length;
+    return this.comunicados.filter((c) => c.ativo).length;
   }
 
-  // total de comunicados inativos
   get totalInativos(): number {
-    return this.comunicados.filter(c => !c.ativo).length;
+    return this.comunicados.filter((c) => !c.ativo).length;
   }
 }

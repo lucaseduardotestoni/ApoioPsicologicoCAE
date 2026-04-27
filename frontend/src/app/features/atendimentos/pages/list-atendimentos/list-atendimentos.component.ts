@@ -23,6 +23,7 @@ export class ListAtendimentosComponent implements OnInit {
   atendimentos: RegistroAtendimento[] = [];
   filtrados: RegistroAtendimento[] = [];
   isLoading = true;
+  errorMessage: string | null = null;
 
   busca = '';
   filtroTipo: TipoAtendimento | '' = '';
@@ -54,11 +55,21 @@ export class ListAtendimentosComponent implements OnInit {
 
   private carregar(): void {
     this.isLoading = true;
-    this.service.listarTodos().subscribe(lista => {
-      this.atendimentos = lista.sort((a, b) => b.data.localeCompare(a.data));
-      this.aplicarFiltros();
-      this.isLoading = false;
-      this.cdr.markForCheck();
+    this.errorMessage = null;
+    this.service.listarTodos().subscribe({
+      next: (lista) => {
+        this.atendimentos = lista.sort((a, b) => b.data.localeCompare(a.data));
+        this.aplicarFiltros();
+        this.isLoading = false;
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.atendimentos = [];
+        this.filtrados = [];
+        this.errorMessage = 'Erro ao carregar atendimentos da API.';
+        this.isLoading = false;
+        this.cdr.markForCheck();
+      },
     });
   }
 

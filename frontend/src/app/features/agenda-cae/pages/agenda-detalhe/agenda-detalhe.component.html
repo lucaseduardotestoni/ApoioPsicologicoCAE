@@ -2,9 +2,16 @@
 
   <h2>Agendamentos dos estudantes</h2>
 
-  <div *ngFor="let a of service.agendamentos$ | async" class="card">
+  <div *ngIf="isLoading">Carregando agendamentos...</div>
+  <div *ngIf="!isLoading && errorMessage">{{ errorMessage }}</div>
+
+  <div *ngFor="let a of agendamentos" class="card">
     <p><b>Estudante:</b> {{ a.estudanteNome }}</p>
     <p><b>Status:</b> {{ a.status }}</p>
+  </div>
+
+  <div *ngIf="!isLoading && !errorMessage && agendamentos.length === 0">
+    Nenhum agendamento encontrado.
   </div>
 
 </div>

@@ -16,21 +16,33 @@ export class ListGrupoComponent implements OnInit {
 
   grupos: GrupoUsuario[] = [];
   isLoading = true;
+  errorMessage: string | null = null;
 
   constructor(
-    private service: GrupoUsuarioService,
-    private cdr: ChangeDetectorRef,
+    private grupoUsuarioService: GrupoUsuarioService,
+    private cdr: ChangeDetectorRef
   ) {}
 
-ngOnInit(): void {
-  // MOCK TEMPORÁRIO
-  this.grupos = [
-    { id: 1, nome: 'Administrador' },
-    { id: 2, nome: 'Usuário Padrão' },
-    { id: 3, nome: 'Coordenador' },
-  ];
+  ngOnInit(): void {
+    this.carregarGrupos();
+  }
 
-  this.isLoading = false;
-  this.cdr.markForCheck();
-}
+  private carregarGrupos(): void {
+    this.isLoading = true;
+    this.errorMessage = null;
+
+    this.grupoUsuarioService.listarTodos().subscribe({
+      next: (grupos) => {
+        this.grupos = grupos;
+        this.isLoading = false;
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.grupos = [];
+        this.errorMessage = 'Erro ao carregar grupos da API.';
+        this.isLoading = false;
+        this.cdr.markForCheck();
+      },
+    });
+  }
 }

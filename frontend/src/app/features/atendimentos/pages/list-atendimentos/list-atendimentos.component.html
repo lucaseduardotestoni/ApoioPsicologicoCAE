@@ -44,8 +44,12 @@
       <div class="spinner"></div> Carregando atendimentos...
     </div>
 
+    <div *ngIf="!isLoading && errorMessage" class="empty">
+      {{ errorMessage }}
+    </div>
+
     <!-- Tabela -->
-    <div *ngIf="!isLoading" class="card">
+    <div *ngIf="!isLoading && !errorMessage" class="card">
       <table class="data-table">
         <thead>
           <tr>

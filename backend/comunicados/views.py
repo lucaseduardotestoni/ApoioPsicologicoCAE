@@ -4,7 +4,7 @@ from .serializers import ComunicadoSerializer, GrupoComunicadoSerializer
 
 
 class ComunicadoViewSet(ModelViewSet):
-    queryset = Comunicado.objects.all()
+    queryset = Comunicado.objects.all().order_by('-data_em', '-id')
     serializer_class = ComunicadoSerializer
 
 

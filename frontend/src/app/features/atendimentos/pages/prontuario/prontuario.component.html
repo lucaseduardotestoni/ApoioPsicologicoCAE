@@ -1,7 +1,6 @@
 <div class="prontuario-page">
   <div class="page-inner">
 
-    <!-- Header -->
     <div class="page-top">
       <div>
         <h1 class="page-title">Prontuário do Estudante</h1>
@@ -15,7 +14,6 @@
       </a>
     </div>
 
-    <!-- Busca -->
     <div class="search-card">
       <div class="search-row">
         <div class="search-input-wrap">
@@ -36,8 +34,11 @@
         </button>
       </div>
 
-      <!-- Resultados da busca -->
-      <div *ngIf="buscaRealizada && !estudanteSelecionado" class="search-results">
+      <div *ngIf="buscaErro && !estudanteSelecionado" class="no-results">
+        {{ buscaErro }}
+      </div>
+
+      <div *ngIf="buscaRealizada && !buscaErro && !estudanteSelecionado" class="search-results">
         <div *ngIf="resultadosBusca.length === 0" class="no-results">
           Nenhum estudante encontrado para "{{ termoBusca }}".
         </div>
@@ -49,7 +50,9 @@
           <div class="result-avatar">{{ e.nome.charAt(0) }}</div>
           <div class="result-info">
             <span class="result-nome">{{ e.nome }}</span>
-            <span class="result-meta">Matrícula: {{ e.matricula }} · {{ e.curso }}</span>
+            <span class="result-meta">
+              Matrícula: {{ e.matricula }}<ng-container *ngIf="e.curso"> · {{ e.curso }}</ng-container>
+            </span>
           </div>
           <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16" class="result-arrow">
             <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/>
@@ -58,10 +61,7 @@
       </div>
     </div>
 
-    <!-- Prontuário do estudante selecionado -->
     <ng-container *ngIf="estudanteSelecionado">
-
-      <!-- Card do estudante -->
       <div class="student-card">
         <div class="student-avatar">{{ estudanteSelecionado.nome.charAt(0) }}</div>
         <div class="student-info">
@@ -98,15 +98,16 @@
         </button>
       </div>
 
-      <!-- Loading atendimentos -->
       <div *ngIf="carregandoAtendimentos" class="loading-state">
         <div class="spinner"></div> Carregando histórico...
       </div>
 
-      <!-- Lista de atendimentos -->
       <div *ngIf="!carregandoAtendimentos">
+        <div *ngIf="atendimentosErro" class="empty-state">
+          <p>{{ atendimentosErro }}</p>
+        </div>
 
-        <div *ngIf="atendimentos.length === 0" class="empty-state">
+        <div *ngIf="!atendimentosErro && atendimentos.length === 0" class="empty-state">
           <svg viewBox="0 0 24 24" fill="currentColor" width="40" height="40" style="opacity:.3">
             <path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
           </svg>
@@ -114,52 +115,49 @@
           <a [routerLink]="['/atendimentos/novo']" class="btn-new-sm">Registrar primeiro atendimento</a>
         </div>
 
-        <div *ngFor="let a of atendimentos" class="atendimento-card">
-
-          <!-- Cabeçalho do card (sempre visível) -->
-          <div class="atend-header" (click)="toggleExpandir(a.id)">
-            <div class="atend-tipo-dot" [style.background]="tipoCores[a.tipo]"></div>
-            <div class="atend-summary">
-              <div class="atend-top-row">
-                <span class="atend-tipo" [style.color]="tipoCores[a.tipo]">{{ tipoLabels[a.tipo] }}</span>
-                <span class="atend-data">{{ a.data | date:'dd/MM/yyyy' }}</span>
+        <div *ngIf="!atendimentosErro">
+          <div *ngFor="let a of atendimentos" class="atendimento-card">
+            <div class="atend-header" (click)="toggleExpandir(a.id)">
+              <div class="atend-tipo-dot" [style.background]="tipoCores[a.tipo]"></div>
+              <div class="atend-summary">
+                <div class="atend-top-row">
+                  <span class="atend-tipo" [style.color]="tipoCores[a.tipo]">{{ tipoLabels[a.tipo] }}</span>
+                  <span class="atend-data">{{ a.data | date:'dd/MM/yyyy' }}</span>
+                </div>
+                <p class="atend-preview">{{ a.descricao | slice:0:100 }}{{ a.descricao.length > 100 ? '...' : '' }}</p>
+                <span class="atend-responsavel">
+                  <svg viewBox="0 0 24 24" fill="currentColor" width="12" height="12"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                  {{ a.responsavel }}
+                </span>
               </div>
-              <p class="atend-preview">{{ a.descricao | slice:0:100 }}{{ a.descricao.length > 100 ? '...' : '' }}</p>
-              <span class="atend-responsavel">
-                <svg viewBox="0 0 24 24" fill="currentColor" width="12" height="12"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-                {{ a.responsavel }}
-              </span>
-            </div>
-            <button class="expand-btn" [class.expanded]="isExpandido(a.id)" aria-label="Expandir">
-              <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
-                <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
-              </svg>
-            </button>
-          </div>
-
-          <!-- Detalhes expandidos -->
-          <div class="atend-details" *ngIf="isExpandido(a.id)">
-            <div class="detail-section">
-              <h4 class="detail-label">Descrição completa</h4>
-              <p class="detail-text">{{ a.descricao }}</p>
-            </div>
-            <div class="detail-section" *ngIf="a.observacoes">
-              <h4 class="detail-label">Observações</h4>
-              <p class="detail-text">{{ a.observacoes }}</p>
-            </div>
-            <div class="detail-actions">
-              <a [routerLink]="['/atendimentos/editar', a.id]" class="action-btn">
-                <svg viewBox="0 0 24 24" fill="currentColor" width="13" height="13">
-                  <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+              <button class="expand-btn" [class.expanded]="isExpandido(a.id)" aria-label="Expandir">
+                <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
+                  <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
                 </svg>
-                Editar
-              </a>
+              </button>
+            </div>
+
+            <div class="atend-details" *ngIf="isExpandido(a.id)">
+              <div class="detail-section">
+                <h4 class="detail-label">Descrição completa</h4>
+                <p class="detail-text">{{ a.descricao }}</p>
+              </div>
+              <div class="detail-section" *ngIf="a.observacoes">
+                <h4 class="detail-label">Observações</h4>
+                <p class="detail-text">{{ a.observacoes }}</p>
+              </div>
+              <div class="detail-actions">
+                <a [routerLink]="['/atendimentos/editar', a.id]" class="action-btn">
+                  <svg viewBox="0 0 24 24" fill="currentColor" width="13" height="13">
+                    <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                  </svg>
+                  Editar
+                </a>
+              </div>
             </div>
           </div>
-
         </div>
       </div>
-
     </ng-container>
 
   </div>

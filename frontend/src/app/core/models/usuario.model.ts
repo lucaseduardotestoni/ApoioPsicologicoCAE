@@ -20,13 +20,28 @@ export interface Usuario {
 export type UsuarioStatus = 'ATIVO' | 'INATIVO';
 
 /**
- * Payload enviado ao backend para criação de usuário.
- * A senha é enviada em texto puro e o backend realiza o hash.
+ * Dados do formulário de usuário, usados tanto para criação quanto edição.
+ * A senha é opcional no modo edição.
  */
-export interface CreateUsuarioPayload {
+export interface UsuarioFormPayload {
   nome: string;
-  senha: string;
+  senha?: string;
   grupoUsuarioId: number;
   mudaSenha: boolean;
   status: UsuarioStatus;
+}
+
+/**
+ * Payload enviado ao backend para criação de usuário.
+ * A senha é enviada em texto puro e o backend realiza o hash.
+ */
+export interface CreateUsuarioPayload extends UsuarioFormPayload {
+  senha: string;
+}
+
+/**
+ * Payload usado na atualização de usuário.
+ */
+export interface UpdateUsuarioPayload extends UsuarioFormPayload {
+  senha?: string;
 }

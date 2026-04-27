@@ -1,5 +1,5 @@
 <!-- 
-  Template da página de criação de usuário.
+  Template da página de edição de usuário.
   Este container orquestra os dados e delega o formulário ao componente filho.
 -->
 <div class="page-wrapper">
@@ -47,16 +47,18 @@
         <button class="alert-close" (click)="fecharFeedback()">×</button>
       </div>
 
-      <!-- Loading de grupos -->
-      <div *ngIf="isLoadingGrupos" class="loading-state">
+      <!-- Loading de grupos ou usuário -->
+      <div *ngIf="isLoadingPage" class="loading-state">
         <div class="loading-spinner"></div>
-        <span>Carregando grupos do formulário...</span>
+        <span>Carregando dados do usuário...</span>
       </div>
 
-      <!-- Formulário — renderizado somente após grupos carregados -->
+      <!-- Formulário — renderizado somente após dados carregados -->
       <app-usuario-form
-        *ngIf="!isLoadingGrupos"
+        *ngIf="!isLoadingPage"
         [grupos]="grupos"
+        [usuario]="usuario"
+        [isEditMode]="true"
         [isLoading]="isLoading"
         (formSubmit)="onFormSubmit($event)"
         (cancelar)="onCancelar()"

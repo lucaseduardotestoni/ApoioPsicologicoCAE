@@ -1,123 +1,158 @@
 import { Injectable } from '@angular/core';
-import { Observable, of, throwError } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { Observable, map } from 'rxjs';
 import {
   CreateAtendimentoPayload,
   Estudante,
   RegistroAtendimento,
+  TipoAtendimento,
 } from '../models/atendimento.model';
 
-/**
- * AtendimentoService — CRUD de registros de atendimento e lista de estudantes.
- * Dados persistidos em memória (mock). Substituir por HttpClient na integração real.
- */
+interface ListResponse<T> {
+  count?: number;
+  results?: T[];
+}
+
+interface EstudanteApi {
+  id: number;
+  nome: string;
+  codigo_pessoa?: string;
+  codigo_vinculo?: string;
+  curso?: string | null;
+  email?: string | null;
+}
+
+interface AtendimentoApi {
+  id?: number;
+  estudante_id: number;
+  estudante_nome?: string;
+  data: string;
+  tipo: string;
+  descricao: string;
+  responsavel: string;
+  observacoes?: string | null;
+  criado_em?: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class AtendimentoService {
-  private nextId = 4;
+  private readonly apiBaseUrl = 'http://localhost:8000/api';
 
-  private mockEstudantes: Estudante[] = [
-    { id: 1, nome: 'Ana Paula Souza',    matricula: '2021001', curso: 'Sistemas de Informação', email: 'ana@furb.br' },
-    { id: 2, nome: 'Carlos Eduardo Lima', matricula: '2020045', curso: 'Engenharia de Software',  email: 'carlos@furb.br' },
-    { id: 3, nome: 'Fernanda Oliveira',   matricula: '2022012', curso: 'Ciência da Computação',   email: 'fernanda@furb.br' },
-    { id: 4, nome: 'João Pedro Martins',  matricula: '2019088', curso: 'Sistemas de Informação', email: 'joao@furb.br' },
-    { id: 5, nome: 'Mariana Costa',       matricula: '2023003', curso: 'Engenharia de Software',  email: 'mariana@furb.br' },
-  ];
-
-  private mockAtendimentos: RegistroAtendimento[] = [
-    {
-      id: 1,
-      estudanteId: 1,
-      estudanteNome: 'Ana Paula Souza',
-      data: '2025-04-10',
-      tipo: 'PSICOLOGICO',
-      descricao: 'Sessão inicial de acolhimento. Estudante relatou dificuldades de adaptação ao curso.',
-      responsavel: 'Eduardo Zirbell',
-      observacoes: 'Retorno agendado para 2 semanas.',
-      criadoEm: new Date('2025-04-10'),
-    },
-    {
-      id: 2,
-      estudanteId: 1,
-      estudanteNome: 'Ana Paula Souza',
-      data: '2025-04-24',
-      tipo: 'PSICOLOGICO',
-      descricao: 'Segunda sessão. Melhora significativa no quadro de ansiedade.',
-      responsavel: 'Eduardo Zirbell',
-      criadoEm: new Date('2025-04-24'),
-    },
-    {
-      id: 3,
-      estudanteId: 2,
-      estudanteNome: 'Carlos Eduardo Lima',
-      data: '2025-04-15',
-      tipo: 'PEDAGOGICO',
-      descricao: 'Orientação sobre aproveitamento acadêmico e técnicas de estudo.',
-      responsavel: 'Guilherme Kuhnen',
-      observacoes: 'Encaminhado para monitoria de Cálculo.',
-      criadoEm: new Date('2025-04-15'),
-    },
-  ];
-
-  // ── Estudantes ────────────────────────────────────────────────────────────
+  constructor(private readonly http: HttpClient) {}
 
   listarEstudantes(): Observable<Estudante[]> {
-    return of([...this.mockEstudantes]);
+    return this.http.get<unknown>(`${this.apiBaseUrl}/estudantes/`).pipe(
+      map((response) => this.mapLista(response, (item) => this.mapEstudante(item as EstudanteApi)))
+    );
   }
 
   buscarEstudantes(termo: string): Observable<Estudante[]> {
-    const t = termo.toLowerCase().trim();
-    if (!t) return of([...this.mockEstudantes]);
-    const resultado = this.mockEstudantes.filter(
-      e =>
-        e.nome.toLowerCase().includes(t) ||
-        e.matricula.toLowerCase().includes(t)
+    const termoNormalizado = termo.toLowerCase().trim();
+
+    return this.listarEstudantes().pipe(
+      map((estudantes) => {
+        if (!termoNormalizado) return estudantes;
+
+        return estudantes.filter(
+          (estudante) =>
+            estudante.nome.toLowerCase().includes(termoNormalizado) ||
+            estudante.matricula.toLowerCase().includes(termoNormalizado)
+        );
+      })
     );
-    return of(resultado);
   }
 
   buscarEstudantePorId(id: number): Observable<Estudante | undefined> {
-    return of(this.mockEstudantes.find(e => e.id === id));
+    return this.http.get<EstudanteApi>(`${this.apiBaseUrl}/estudantes/${id}/`).pipe(
+      map((estudante) => this.mapEstudante(estudante))
+    );
   }
 
-  // ── Atendimentos ──────────────────────────────────────────────────────────
-
   listarTodos(): Observable<RegistroAtendimento[]> {
-    return of([...this.mockAtendimentos]);
+    return this.http.get<unknown>(`${this.apiBaseUrl}/atendimentos/`).pipe(
+      map((response) => this.mapLista(response, (item) => this.mapAtendimento(item as AtendimentoApi)))
+    );
   }
 
   listarPorEstudante(estudanteId: number): Observable<RegistroAtendimento[]> {
-    return of(
-      this.mockAtendimentos
-        .filter(a => a.estudanteId === estudanteId)
-        .sort((a, b) => b.data.localeCompare(a.data))
+    return this.http.get<unknown>(`${this.apiBaseUrl}/atendimentos/?estudante_id=${estudanteId}`).pipe(
+      map((response) => this.mapLista(response, (item) => this.mapAtendimento(item as AtendimentoApi)))
     );
   }
 
   buscarPorId(id: number): Observable<RegistroAtendimento | undefined> {
-    return of(this.mockAtendimentos.find(a => a.id === id));
+    return this.http.get<AtendimentoApi>(`${this.apiBaseUrl}/atendimentos/${id}/`).pipe(
+      map((atendimento) => this.mapAtendimento(atendimento))
+    );
   }
 
   criar(payload: CreateAtendimentoPayload): Observable<RegistroAtendimento> {
-    const novo: RegistroAtendimento = {
-      id: this.nextId++,
-      ...payload,
-      criadoEm: new Date(),
-    };
-    this.mockAtendimentos.push(novo);
-    return of(novo);
+    return this.http.post<AtendimentoApi>(`${this.apiBaseUrl}/atendimentos/`, this.mapPayload(payload)).pipe(
+      map((atendimento) => this.mapAtendimento(atendimento))
+    );
   }
 
-  atualizar(
-    id: number,
-    payload: CreateAtendimentoPayload
-  ): Observable<RegistroAtendimento> {
-    const idx = this.mockAtendimentos.findIndex(a => a.id === id);
-    if (idx === -1) return throwError(() => new Error('Atendimento não encontrado.'));
-    this.mockAtendimentos[idx] = { ...this.mockAtendimentos[idx], ...payload };
-    return of(this.mockAtendimentos[idx]);
+  atualizar(id: number, payload: CreateAtendimentoPayload): Observable<RegistroAtendimento> {
+    return this.http.patch<AtendimentoApi>(`${this.apiBaseUrl}/atendimentos/${id}/`, this.mapPayload(payload)).pipe(
+      map((atendimento) => this.mapAtendimento(atendimento))
+    );
   }
 
   remover(id: number): Observable<void> {
-    this.mockAtendimentos = this.mockAtendimentos.filter(a => a.id !== id);
-    return of(void 0);
+    return this.http.delete<void>(`${this.apiBaseUrl}/atendimentos/${id}/`);
+  }
+
+  private mapPayload(payload: CreateAtendimentoPayload): Record<string, unknown> {
+    return {
+      estudante_id: payload.estudanteId,
+      data: payload.data,
+      tipo: payload.tipo,
+      descricao: payload.descricao.trim(),
+      responsavel: payload.responsavel.trim(),
+      observacoes: payload.observacoes?.trim() || '',
+    };
+  }
+
+  private mapEstudante(estudante: EstudanteApi): Estudante {
+    return {
+      id: estudante.id,
+      nome: estudante.nome,
+      matricula: estudante.codigo_vinculo || estudante.codigo_pessoa || '',
+      curso: estudante.curso || undefined,
+      email: estudante.email || undefined,
+    };
+  }
+
+  private mapAtendimento(atendimento: AtendimentoApi): RegistroAtendimento {
+    return {
+      id: atendimento.id ?? 0,
+      estudanteId: atendimento.estudante_id,
+      estudanteNome: atendimento.estudante_nome ?? '',
+      data: atendimento.data,
+      tipo: this.normalizarTipo(atendimento.tipo),
+      descricao: atendimento.descricao,
+      responsavel: atendimento.responsavel,
+      observacoes: atendimento.observacoes || undefined,
+      criadoEm: atendimento.criado_em ? new Date(atendimento.criado_em) : undefined,
+    };
+  }
+
+  private normalizarTipo(tipo: string): TipoAtendimento {
+    return String(tipo).toUpperCase() as TipoAtendimento;
+  }
+
+  private mapLista<T>(response: unknown, mapper: (item: unknown) => T): T[] {
+    const lista = this.isListResponse<unknown>(response)
+      ? (response.results ?? [])
+      : Array.isArray(response)
+        ? response
+        : [];
+
+    return lista.map((item) => mapper(item));
+  }
+
+  private isListResponse<T>(value: unknown): value is ListResponse<T> {
+    if (!value || typeof value !== 'object') return false;
+    return 'results' in value || 'count' in value;
   }
 }

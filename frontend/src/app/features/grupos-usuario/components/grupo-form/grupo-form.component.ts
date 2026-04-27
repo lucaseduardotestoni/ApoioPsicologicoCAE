@@ -1,15 +1,15 @@
 import {
-  ChangeDetectionStrategy, Component, EventEmitter,
-  Input, OnChanges, OnInit, Output, SimpleChanges
+  ChangeDetectionStrategy,
+  Component,
+  Input,
+  OnChanges,
+  OnInit,
+  SimpleChanges,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { GrupoUsuario } from '../../../../core/models/grupo-usuario.model';
 
-/**
- * Componente "dumb" — só cuida do campo Nome do grupo.
- * Emite o valor quando válido via @Output.
- */
 @Component({
   selector: 'app-grupo-form',
   standalone: true,
@@ -19,25 +19,19 @@ import { GrupoUsuario } from '../../../../core/models/grupo-usuario.model';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GrupoFormComponent implements OnInit, OnChanges {
-
-  /** Dados para modo edição */
   @Input() grupo: GrupoUsuario | null = null;
   @Input() isLoading = false;
 
-  @Output() nomeChange = new EventEmitter<string | null>();
-
   form!: FormGroup;
 
-  constructor(private fb: FormBuilder) {}
+  constructor(private readonly fb: FormBuilder) {}
 
   ngOnInit(): void {
     this.form = this.fb.group({
-      nome: [this.grupo?.nome ?? '', [Validators.required, Validators.minLength(3), Validators.maxLength(50)]],
-    });
-
-    // Emite null quando inválido, string quando válido
-    this.form.valueChanges.subscribe(() => {
-      this.nomeChange.emit(this.form.valid ? this.form.value.nome : null);
+      nome: [
+        this.grupo?.nome ?? '',
+        [Validators.required, Validators.minLength(3), Validators.maxLength(30)],
+      ],
     });
   }
 
@@ -45,19 +39,32 @@ export class GrupoFormComponent implements OnInit, OnChanges {
     if (changes['grupo'] && this.form && this.grupo) {
       this.form.patchValue({ nome: this.grupo.nome }, { emitEvent: false });
     }
+
     if (changes['isLoading'] && this.form) {
       this.isLoading ? this.form.disable() : this.form.enable();
     }
   }
 
-  /** Exposto para o container acionar validação visual antes do submit */
   markAllTouched(): void {
     this.form.markAllAsTouched();
   }
 
+  isValid(): boolean {
+    return this.form.valid;
+  }
+
+  getPayload(): GrupoUsuario {
+    const nome = String(this.form.getRawValue().nome ?? '').trim();
+
+    return {
+      ...this.grupo,
+      nome,
+    };
+  }
+
   hasError(campo: string, erro?: string): boolean {
-    const c = this.form.get(campo);
-    if (!c || !(c.touched || c.dirty)) return false;
-    return erro ? c.hasError(erro) : c.invalid;
+    const control = this.form.get(campo);
+    if (!control || !(control.touched || control.dirty)) return false;
+    return erro ? control.hasError(erro) : control.invalid;
   }
 }

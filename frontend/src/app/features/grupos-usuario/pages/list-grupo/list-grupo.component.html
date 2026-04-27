@@ -16,7 +16,11 @@
       <div class="spinner"></div> Carregando...
     </div>
 
-    <div *ngIf="!isLoading" class="card">
+    <div *ngIf="!isLoading && errorMessage" class="empty">
+      {{ errorMessage }}
+    </div>
+
+    <div *ngIf="!isLoading && !errorMessage" class="card">
       <table class="data-table">
         <thead>
           <tr>
@@ -31,7 +35,7 @@
             <td class="td-nome">
               <div class="grupo-nome-wrap">
                 <div class="grupo-avatar" [style.background]="'#1565C020'" [style.color]="'#1565C0'">
-                  {{ g.nome.charAt(0).toUpperCase() }}
+                  {{ (g.nome || '?').charAt(0).toUpperCase() }}
                 </div>
                 {{ g.nome }}
               </div>

@@ -36,7 +36,7 @@ export const routes: Routes = [
       {
         path: 'usuarios/editar/:id',
         loadComponent: () =>
-          import('./features/usuarios/pages/create-usuario/create-usuario.component').then(m => m.CreateUsuarioComponent),
+          import('./features/usuarios/pages/edit-usuario/edit-usuario.component').then(m => m.EditUsuarioComponent),
       },
 
       // ── Grupos ────────────────────────────────────────────────

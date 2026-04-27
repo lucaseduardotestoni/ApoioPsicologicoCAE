@@ -16,34 +16,33 @@ export class ListUsuarioComponent implements OnInit {
 
   usuarios: Usuario[] = [];
   isLoading = true;
+  errorMessage: string | null = null;
 
   constructor(
-    private service: UsuarioService,
-    private cdr: ChangeDetectorRef,
+    private usuarioService: UsuarioService,
+    private cdr: ChangeDetectorRef
   ) {}
 
-ngOnInit(): void {
-  // MOCK TEMPORÁRIO
-  this.usuarios = [
-    {
-      id: 1,
-      nome: 'Guilherme Kuhnen',
-      status: 'ATIVO',
-      grupoUsuarioId: 1,
-      horaCriado: new Date(),
-      mudaSenha: false,
-    },
-    {
-      id: 2,
-      nome: 'Eduardo Zirbell',
-      status: 'INATIVO',
-      grupoUsuarioId: 2,
-      horaCriado: new Date(),
-      mudaSenha: false,
-    }
-  ];
+  ngOnInit(): void {
+    this.carregarUsuarios();
+  }
 
-  this.isLoading = false;
-  this.cdr.markForCheck();
-}
+  private carregarUsuarios(): void {
+    this.isLoading = true;
+    this.errorMessage = null;
+
+    this.usuarioService.listarTodos().subscribe({
+      next: (usuarios) => {
+        this.usuarios = usuarios;
+        this.isLoading = false;
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.usuarios = [];
+        this.errorMessage = 'Erro ao carregar usuários da API.';
+        this.isLoading = false;
+        this.cdr.markForCheck();
+      },
+    });
+  }
 }

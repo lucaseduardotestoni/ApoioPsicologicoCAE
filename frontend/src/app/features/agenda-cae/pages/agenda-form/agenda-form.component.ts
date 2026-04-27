@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { AgendaCaeService } from '../../../../core/services/agenda-cae.service';
 
@@ -8,58 +8,82 @@ import { AgendaCaeService } from '../../../../core/services/agenda-cae.service';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterModule],
   templateUrl: './agenda-form.component.html',
-  styleUrls: ['./agenda-form.component.scss']
+  styleUrls: ['./agenda-form.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AgendaFormComponent implements OnInit {
+  form!: FormGroup;
 
-  form: any;
   editMode = false;
+  isLoading = false;
+  errorMessage: string | null = null;
 
   constructor(
-    private fb: FormBuilder,
-    private service: AgendaCaeService,
-    private router: Router,
-    private route: ActivatedRoute
+    private readonly fb: FormBuilder,
+    private readonly service: AgendaCaeService,
+    private readonly router: Router,
+    private readonly route: ActivatedRoute,
+    private readonly cdr: ChangeDetectorRef
   ) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.form = this.fb.group({
       id: [0],
       data: ['', Validators.required],
       horaInicio: ['', Validators.required],
       horaFim: ['', Validators.required],
-      disponivel: [true],
-      observacao: ['']
+      disponivel: [true, Validators.required],
+      observacao: [''],
     });
 
     const id = Number(this.route.snapshot.paramMap.get('id'));
 
     if (id) {
       this.editMode = true;
+      this.isLoading = true;
 
-      this.service.horarios$.subscribe((horarios: any[]) => {
-        const horario = horarios.find(h => h.id === id);
-
-        if (horario) {
+      this.service.buscarHorarioPorId(id).subscribe({
+        next: (horario) => {
           this.form.patchValue(horario);
-        }
+          this.isLoading = false;
+          this.cdr.markForCheck();
+        },
+        error: () => {
+          this.errorMessage = 'Erro ao carregar horário.';
+          this.isLoading = false;
+          this.cdr.markForCheck();
+        },
       });
     }
   }
 
-  cancelar() {
+  cancelar(): void {
     this.router.navigate(['/agenda-cae']);
   }
 
-  salvar() {
-    const value = this.form.value as any;
-
-    if (this.editMode) {
-      this.service.atualizarHorario(value);
-    } else {
-      this.service.criarHorario(value);
+  salvar(): void {
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
     }
 
-    this.router.navigate(['/agenda-cae']);
+    this.isLoading = true;
+    this.errorMessage = null;
+    this.cdr.markForCheck();
+
+    const value = this.form.getRawValue() as any;
+
+    const request$ = this.editMode
+      ? this.service.atualizarHorario(value)
+      : this.service.criarHorario(value);
+
+    request$.subscribe({
+      next: () => this.router.navigate(['/agenda-cae']),
+      error: () => {
+        this.errorMessage = 'Erro ao salvar horário.';
+        this.isLoading = false;
+        this.cdr.markForCheck();
+      },
+    });
   }
 }

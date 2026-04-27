@@ -1,7 +1,6 @@
 <div class="list-page">
   <div class="page-inner">
 
-    <!-- Header com stats -->
     <div class="page-top">
       <div>
         <h1 class="page-title">Comunicados</h1>
@@ -15,7 +14,6 @@
       </a>
     </div>
 
-    <!-- Stats rápidas -->
     <div class="stats-row">
       <div class="stat-card">
         <span class="stat-num">{{ comunicados.length }}</span>
@@ -31,7 +29,6 @@
       </div>
     </div>
 
-    <!-- Filtros -->
     <div class="filters-card">
       <div class="filter-group">
         <label class="filter-label">Status:</label>
@@ -58,13 +55,15 @@
       </button>
     </div>
 
-    <!-- Loading -->
     <div *ngIf="isLoading" class="loading-state">
       <div class="spinner"></div> Carregando comunicados...
     </div>
 
-    <!-- Lista -->
-    <div *ngIf="!isLoading" class="card">
+    <div *ngIf="!isLoading && errorMessage" class="empty">
+      {{ errorMessage }}
+    </div>
+
+    <div *ngIf="!isLoading && !errorMessage" class="card">
       <table class="data-table">
         <thead>
           <tr>
@@ -75,7 +74,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let c of comunicadosFiltrados" [routerLink]="['/comunicados/visualizar', c.id]" class="clickable-row">
+          <tr *ngFor="let c of comunicadosFiltrados" [routerLink]="['/comunicados', c.id]" class="clickable-row">
             <td class="td-titulo">
               <div class="titulo-wrap">
                 <span class="titulo-text">{{ c.titulo }}</span>

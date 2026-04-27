@@ -16,7 +16,7 @@
 
   <!-- Cards de acesso rápido -->
   <div class="cards-grid">
-    <div class="dash-card" *ngFor="let card of cards">
+    <div class="dash-card" *ngFor="let card of (cards$ | async) ?? []">
       <div class="card-top">
         <div class="card-icon" [style.background]="card.cor + '18'" [style.color]="card.cor">
           <svg viewBox="0 0 24 24" fill="currentColor" width="26" height="26">
