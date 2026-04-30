@@ -1,0 +1,97 @@
+name: Python API CI
+
+on:
+  push:
+    branches:
+      - '**'
+    paths:
+      - 'backend/**'
+      - '.github/workflows/python-api-ci.yml'
+  pull_request:
+    paths:
+      - 'backend/**'
+      - '.github/workflows/python-api-ci.yml'
+  workflow_dispatch:
+
+jobs:
+  backend-validation:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: conectacae
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: '123'
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres -d conectacae"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    defaults:
+      run:
+        shell: bash
+        working-directory: backend
+
+    env:
+      DJANGO_SETTINGS_MODULE: conectacae.settings
+      PYTHONUNBUFFERED: '1'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: pip
+          cache-dependency-path: backend/requirements.txt
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Wait for PostgreSQL
+        run: |
+          for _ in {1..30}; do
+            if python - <<'PY'
+import os
+import sys
+import psycopg2
+
+try:
+    conn = psycopg2.connect(
+        dbname='conectacae',
+        user='postgres',
+        password='123',
+        host='127.0.0.1',
+        port=5432,
+    )
+    conn.close()
+except Exception:
+    sys.exit(1)
+PY
+            then
+              exit 0
+            fi
+            sleep 2
+          done
+          exit 1
+
+      - name: Django system checks
+        run: python manage.py check
+
+      - name: Detect pending migrations
+        run: python manage.py makemigrations --check --dry-run
+
+      - name: Apply migrations
+        run: python manage.py migrate --noinput
+
+      - name: Run backend tests
+        run: python manage.py test
