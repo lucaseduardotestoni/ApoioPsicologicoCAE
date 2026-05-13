@@ -23,7 +23,7 @@ A proposta do projeto é centralizar rotinas administrativas e de acompanhamento
 ## Estrutura do Projeto
 
 ```txt
-TCC-ApoioPsicologicoCAE/
+ApoioPsicologicoCAE/
 ├── backend/      API em Django + Django REST Framework
 ├── frontend/     Aplicação web em Angular
 ├── .github/      Workflows do GitHub Actions
@@ -248,3 +248,69 @@ Atualmente o projeto possui pipeline automatizado para validação do backend Py
 - O backend utiliza autenticação JWT.
 - O frontend consome a API REST disponibilizada pelo backend.
 - O pipeline falha automaticamente caso testes ou validações apresentem erro.
+
+---
+
+# Relatório do Trabalho
+
+Documentação das questões propostas pelo professor no enunciado do trabalho de Infraestrutura de TIC.
+
+---
+
+## Tarefa 3 — O que acontece se um teste falhar propositalmente?
+
+Quando um teste falha, o pipeline do GitHub Actions é interrompido automaticamente e o workflow é marcado como **failed**. Dessa forma, o código não é considerado válido para integração na branch principal até que o erro seja corrigido. Isso garante maior confiabilidade na aplicação, evitando que alterações com problemas sejam enviadas para produção.
+
+---
+
+## Tarefa 4 — Em que cenário real a publicação de artefatos seria útil?
+
+A publicação de artefatos é útil para armazenar arquivos gerados durante o processo de build, como pacotes, executáveis ou versões compiladas da aplicação. Em cenários reais, isso permite que equipes de QA, homologação ou deploy baixem os arquivos diretamente do pipeline sem precisar recompilar o projeto manualmente.
+
+---
+
+## Tarefa 5 — Por que nunca devemos commitar credenciais no código?
+
+Credenciais nunca devem ser armazenadas diretamente no código-fonte porque isso pode expor informações sensíveis, como senhas, tokens e chaves de acesso. Caso o repositório seja compartilhado ou publicado, essas informações podem ser utilizadas indevidamente por terceiros, comprometendo a segurança da aplicação e dos dados. Por esse motivo, o projeto utiliza **GitHub Secrets** para armazenar credenciais de forma segura no pipeline CI/CD.
+
+---
+
+## Tarefa 6 — Qual versão apresentou alguma diferença de comportamento, se houver?
+
+Não foram identificadas diferenças de comportamento relevantes entre as versões utilizadas (Python 3.12 e 3.13).
+
+---
+
+## Tarefa 7 — Regra de proteção de branch
+
+A branch `main` foi configurada com regra de proteção exigindo:
+
+- Abertura de Pull Request para qualquer alteração;
+- Aprovação dos status checks do pipeline antes do merge (`lint`, `test` 3.12/3.13 e `build`);
+- Bloqueio de push direto, garantindo que nenhum código entre na `main` sem validação automatizada.
+
+Print do painel de configuração:
+
+![Painel de configuração da branch protection](docs/Painel_config.png)
+
+---
+
+## Tarefa 8 — Por que paralelismo importa em pipelines de CI?
+
+O paralelismo permite executar múltiplos jobs simultaneamente, reduzindo o tempo total de execução do pipeline. Em ambientes reais, isso acelera validações, testes e builds, permitindo feedback mais rápido para a equipe de desenvolvimento e aumentando a produtividade.
+
+---
+
+## Tarefa 9 — Qual a diferença entre uma tag `latest` e uma tag por SHA? Quando usar cada uma?
+
+A tag `latest` representa a versão mais recente da imagem Docker publicada no repositório. Já a tag baseada no SHA do commit identifica exatamente qual versão do código gerou aquela imagem, garantindo rastreabilidade e maior controle de versões.
+
+A tag `latest` é útil para ambientes de desenvolvimento e atualização rápida, enquanto a tag SHA é mais indicada para produção e auditoria, pois permite reproduzir exatamente a versão utilizada.
+
+---
+
+## O que aprendemos e dificuldades encontradas
+
+Durante o desenvolvimento do trabalho, foi possível compreender melhor o funcionamento de pipelines CI/CD utilizando GitHub Actions e integração com banco de dados em containers Docker.
+
+O trabalho permitiu aproximar o desenvolvimento acadêmico de práticas reais utilizadas em ambientes profissionais de DevOps.
