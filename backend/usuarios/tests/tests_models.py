@@ -38,7 +38,7 @@ class UsuarioModelTest(TestCase):
     def test_usuario_criacao_sucesso(self):
         """Testa a criação com sucesso de um usuário"""
         self.assertEqual(self.usuario.nome, "Dr. Silva")
-        self.assertEqual(self.usuario.status, "desativo")
+        self.assertEqual(self.usuario.status, "ativo")
         self.assertEqual(self.usuario.grupo_usuario_id, self.grupo)
 
     def test_usuario_str(self):
