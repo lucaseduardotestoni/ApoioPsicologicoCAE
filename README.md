@@ -1,8 +1,10 @@
 # ConectaCAE
 
-Sistema acadêmico voltado ao apoio psicológico e à organização de atendimentos no CAE. O projeto está dividido em um backend em Django/DRF e um frontend em Angular, com foco em cadastro de usuários, controle de grupos e permissões, agenda de horários, registro de atendimentos e publicação de comunicados.
+Sistema acadêmico voltado ao apoio psicológico e à organização de atendimentos no CAE. O projeto está dividido em um backend em Django REST Framework e um frontend em Angular, com foco em cadastro de usuários, controle de grupos e permissões, agenda de horários, registro de atendimentos e publicação de comunicados.
 
-## Vis�o geral
+---
+
+## Visão Geral
 
 De forma geral, a aplicação reúne funcionalidades para:
 
@@ -16,36 +18,43 @@ De forma geral, a aplicação reúne funcionalidades para:
 
 A proposta do projeto é centralizar rotinas administrativas e de acompanhamento em uma única interface web.
 
-## Estrutura do projeto
+---
 
-```text
+## Estrutura do Projeto
+
+```txt
 TCC-ApoioPsicologicoCAE/
-|- backend/    API em Django + Django REST Framework
-|- frontend/   Aplica��o web em Angular
-|- README.md
+├── backend/      API em Django + Django REST Framework
+├── frontend/     Aplicação web em Angular
+├── .github/      Workflows do GitHub Actions
+├── README.md
 ```
 
-### Backend
+---
+
+## Backend
 
 O backend expõe endpoints REST sob o prefixo `/api/` e está organizado por domínios:
 
-- `usuarios`: gestão de usuários e grupos de usuários;
-- `permissoes`: controle de permissões e níveis de acesso;
-- `estudantes`: cadastro básico de estudantes;
-- `agenda`: horários disponíveis e agendamentos;
-- `atendimentos`: registros e prontuários de atendimento;
-- `comunicados`: avisos internos vinculados a grupos;
-- `auditoria`: rastreio de ações realizadas.
+- `usuarios` → gestão de usuários e grupos;
+- `permissoes` → controle de permissões e níveis de acesso;
+- `estudantes` → cadastro básico de estudantes;
+- `agenda` → horários disponíveis e agendamentos;
+- `atendimentos` → registros e prontuários de atendimento;
+- `comunicados` → avisos internos vinculados a grupos;
+- `auditoria` → rastreio de ações realizadas.
 
-## Tecnologias utilizadas
+---
+
+## Tecnologias Utilizadas
 
 ### Backend
 
 - Python
 - Django REST Framework
-- JWT para autenticação
+- JWT Authentication
 - PostgreSQL
-- CORS Headers
+- Django CORS Headers
 
 ### Frontend
 
@@ -54,95 +63,181 @@ O backend expõe endpoints REST sob o prefixo `/api/` e está organizado por dom
 - TypeScript
 - RxJS
 
+---
+
 ## Pré-requisitos
 
-Antes de rodar o projeto, tenha instalado:
+Antes de executar o projeto, tenha instalado:
 
-- Python 3.13.13 ou compatável
+- Python 3.13 ou superior
 - Node.js 20 ou superior
 - npm
 - PostgreSQL
 
-## Como rodar o backend
+---
 
-### 1. Acesse a pasta do backend
+# Como Rodar o Backend
 
-```cmd
+## 1. Acesse a pasta do backend
+
+```bash
 cd backend
 ```
 
-### 2. Crie e ative um ambiente virtual
+## 2. Crie e ative o ambiente virtual
 
-```cmd
+### Windows
+
+```bash
 python -m venv .venv
 .\.venv\Scripts\Activate.bat
 ```
 
-### 3. Instale as depend�ncias
+---
 
-```cmd
+## 3. Instale as dependências
+
+```bash
 pip install -r requirements.txt
 ```
 
-### 4. Crie o banco no PostgreSQL
+---
 
-Nas configurações atuais do projeto, o backend espera um banco com estes dados:
+## 4. Configure o banco PostgreSQL
 
-- Banco: `conectacae`
-- Usuário: `postgres`
-- Senha: `123`
-- Host: `localhost`
-- Porta: `5432`
+Nas configurações atuais do projeto, o backend espera um banco com os seguintes dados:
 
-Se preferir usar outro usuário, senha ou nome de banco, ajuste o arquivo `backend/conectacae/settings.py`.
+```txt
+Banco: conectacae
+Usuário: postgres
+Senha: 123
+Host: localhost
+Porta: 5432
+```
 
-### 5. Execute as migrations
+Caso utilize outras credenciais, ajuste o arquivo:
 
-```cmd
+```txt
+backend/conectacae/settings.py
+```
+
+---
+
+## 5. Execute as migrations
+
+```bash
 python manage.py makemigrations
 python manage.py migrate
 ```
 
-### 6. Inicie o servidor
+---
 
-```cmd
+## 6. Inicie o servidor
+
+```bash
 python manage.py runserver
 ```
 
 O backend ficará disponível em:
 
-```text
+```txt
 http://localhost:8000/
 ```
 
-E a API estar� em:
+A API estará disponível em:
 
-```text
+```txt
 http://localhost:8000/api/
 ```
 
-## Como rodar o frontend
+---
 
-### 1. Em outro terminal, acesse a pasta do frontend
+# Como Rodar o Frontend
 
-```cmd
+## 1. Acesse a pasta do frontend
+
+```bash
 cd frontend
 ```
 
-### 2. Instale as depend�ncias
+---
 
-```cmd
+## 2. Instale as dependências
+
+```bash
 npm install
 ```
 
-### 3. Inicie o servidor de desenvolvimento
+---
 
-```cmd
+## 3. Inicie o servidor Angular
+
+```bash
 npm start
 ```
 
 O frontend ficará disponível em:
 
-```text
+```txt
 http://localhost:4200/
 ```
+
+---
+
+## Pipeline CI/CD
+
+O projeto utiliza GitHub Actions para automação de integração contínua (CI/CD).
+
+O pipeline realiza automaticamente:
+
+- instalação de dependências;
+- validação do backend Django;
+- verificação de migrations pendentes;
+- execução de testes automatizados;
+- integração com PostgreSQL em container Docker;
+- validação de build da aplicação.
+
+As credenciais utilizadas no pipeline são armazenadas de forma segura utilizando GitHub Secrets.
+
+---
+
+## Estratégia de Branches
+
+O projeto utiliza organização de branches baseada em separação entre desenvolvimento e produção.
+
+### Branches utilizadas
+
+- `main` → versão estável do sistema;
+- `develop` → integração de funcionalidades em desenvolvimento;
+- `feature/*` → desenvolvimento isolado de novas funcionalidades.
+
+---
+
+## Integrantes
+
+- Eduardo Zirbell
+- Guilherme Kuhnen
+- Kamilly Birkner
+- Kauana Correia
+- Lucas Eduardo
+
+---
+
+## GitHub Actions
+
+Os workflows da aplicação estão localizados em:
+
+```txt
+.github/workflows/
+```
+
+Atualmente o projeto possui pipeline automatizado para validação do backend Python/Django.
+
+---
+
+## Observações
+
+- O projeto utiliza PostgreSQL como banco principal.
+- O backend utiliza autenticação JWT.
+- O frontend consome a API REST disponibilizada pelo backend.
+- O pipeline falha automaticamente caso testes ou validações apresentem erro.
