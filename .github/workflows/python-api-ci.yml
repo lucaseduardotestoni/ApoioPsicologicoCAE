@@ -1,97 +1,209 @@
-name: Python API CI
+# ============================================================
+# Etapas (jobs):
+#   1) lint           -> Valida configuracao do Django 
+#   2) test           -> Roda testes unitarios
+#   3) build          -> Empacota o backend e publica como artefato
+#   4) docker-publish -> Builda imagem Docker e envia ao Docker Hub
+#
+# ============================================================
+
+name: Pipeline CI/CD
 
 on:
   push:
     branches:
-      - '**'
-    paths:
-      - 'backend/**'
-      - '.github/workflows/python-api-ci.yml'
+      - main     
+      - develop 
   pull_request:
-    paths:
-      - 'backend/**'
-      - '.github/workflows/python-api-ci.yml'
-  workflow_dispatch:
+    branches:
+      - main      
+  workflow_dispatch: 
+
+env:
+  PYTHONUNBUFFERED: '1'                       # logs do Python sem buffer (saida em tempo real)
+  DJANGO_SETTINGS_MODULE: conectacae.settings # modulo de settings do Django
 
 jobs:
-  backend-validation:
+  # ----------------------------------------------------------
+  # 1: lint - validacao do projeto Django (settings, models, urls, apps)
+  # ----------------------------------------------------------
+  lint:
+    name: Validacao do projeto Django
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: backend  # todos os comandos rodam a partir de /backend
+    env:
+      DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}  # chave secreta do Django (via GitHub Secret)
+    steps:
+      # Baixa o codigo do repositorio na VM
+      - name: Baixar repositorio
+        uses: actions/checkout@v4
 
+      # Instala o Python 3.13 e habilita cache do pip
+      - name: Instalar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: pip
+          cache-dependency-path: backend/requirements-docker.txt
+
+      # Atualiza o pip e instala as dependencias do projeto
+      - name: Instalar dependencias
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-docker.txt
+
+      # Roda os checks internos do Django (settings, models, urls, apps)
+      - name: Checagem de sistema do Django
+        run: python manage.py check
+
+      # Detecta se alguem mexeu em models.py sem rodar makemigrations.
+      - name: Detectar migrations pendentes
+        run: |
+          if ! python manage.py makemigrations --check --dry-run; then
+            echo ""
+            echo "::error title=Migrations pendentes::Voce alterou models.py mas nao gerou as migrations correspondentes."
+            echo ""
+            echo "Como corrigir:"
+            echo "  1) Rode localmente:  python manage.py makemigrations"
+            echo "  2) Commite os arquivos gerados em backend/<app>/migrations/"
+            echo "  3) Faca push novamente para reexecutar o pipeline"
+            exit 1
+          fi
+
+  test:
+    name: Testes (Python)
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false # se 3.12 falhar, 3.13 ainda roda (e vice-versa)
+      matrix:
+        python-version: ['3.12', '3.13']
+    # Service container: Postgres efemero que vive apenas durante o job
     services:
       postgres:
         image: postgres:16
         env:
           POSTGRES_DB: conectacae
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: '123'
+          POSTGRES_USER: ${{ secrets.DB_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }}
         ports:
           - 5432:5432
+        # Healthcheck para garantir que o Postgres esteja pronto
         options: >-
-          --health-cmd="pg_isready -U postgres -d conectacae"
+          --health-cmd="pg_isready"
           --health-interval=10s
           --health-timeout=5s
           --health-retries=5
-
     defaults:
       run:
         shell: bash
         working-directory: backend
-
+    # Variaveis que o Django usa para conectar no Postgres do service container
     env:
-      DJANGO_SETTINGS_MODULE: conectacae.settings
-      PYTHONUNBUFFERED: '1'
-
+      DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
+      DB_HOST: 127.0.0.1
+      DB_PORT: '5432'
+      DB_NAME: conectacae
+      DB_USER: ${{ secrets.DB_USER }}
+      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
     steps:
-      - name: Checkout repository
+      - name: Baixar repositorio
         uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Instalar Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
-          python-version: '3.13'
+          python-version: ${{ matrix.python-version }}
           cache: pip
-          cache-dependency-path: backend/requirements.txt
+          cache-dependency-path: backend/requirements-docker.txt
 
-      - name: Install dependencies
+      - name: Instalar dependencias
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install -r requirements-docker.txt
 
-      - name: Wait for PostgreSQL
+      # Loop de espera ate o Postgres aceitar conexoes (max 60s)
+      - name: Aguardar PostgreSQL
         run: |
           for _ in {1..30}; do
-            if python - <<'PY'
-import os
-import sys
-import psycopg2
-
-try:
-    conn = psycopg2.connect(
-        dbname='conectacae',
-        user='postgres',
-        password='123',
-        host='127.0.0.1',
-        port=5432,
-    )
-    conn.close()
-except Exception:
-    sys.exit(1)
-PY
-            then
+            if pg_isready -h 127.0.0.1 -p 5432 -U postgres; then
               exit 0
             fi
             sleep 2
           done
           exit 1
 
-      - name: Django system checks
-        run: python manage.py check
-
-      - name: Detect pending migrations
-        run: python manage.py makemigrations --check --dry-run
-
-      - name: Apply migrations
+      # Cria/atualiza o schema do banco a partir das migrations
+      - name: Aplicar migrations
         run: python manage.py migrate --noinput
 
-      - name: Run backend tests
-        run: python manage.py test
+      # Executa todos os testes do Django com saida detalhada
+      - name: Executar testes
+        run: python manage.py test --verbosity=2
+
+  # ----------------------------------------------------------
+  # 3: Publicar artefato (build)
+  # ----------------------------------------------------------
+  build:
+    name: Empacotar e publicar artefato
+    runs-on: ubuntu-latest
+    needs: [lint, test]  # depende dos jobs anteriores
+    steps:
+      - name: Baixar repositorio
+        uses: actions/checkout@v4
+
+      # Gera o zip excluindo caches e venvs locais
+      - name: Empacotar backend
+        run: |
+          mkdir -p dist
+          tar --exclude='__pycache__' \
+              --exclude='.venv' \
+              --exclude='venv' \
+              --exclude='*.sqlite3' \
+              -czf dist/backend-build.tar.gz backend/
+
+      # Envia o artefato do workflow (mantido por 7 dias)
+      - name: Subir artefato
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-build-${{ github.sha }}
+          path: dist/backend-build.tar.gz
+          if-no-files-found: error
+          retention-days: 7
+
+  # ----------------------------------------------------------
+  # 4: docker-publish - publicar imagem Docker no Docker Hub
+  # ----------------------------------------------------------
+  docker-publish:
+    name: Buildar e publicar imagem Docker
+    runs-on: ubuntu-latest
+    needs: [build]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - name: Baixar repositorio
+        uses: actions/checkout@v4
+
+      # Habilita Buildx
+      - name: Configurar Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # Autentica no Docker Hub 
+      - name: Login no Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      # Builda a imagem usando o Dockerfile do backend e publica
+      # com duas tags: ":latest" e ":<commit SHA>" (rastreabilidade).
+      - name: Buildar e enviar imagem
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          file: ./backend/Dockerfile
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/apoiopsicologicocae:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/apoiopsicologicocae:${{ github.sha }}

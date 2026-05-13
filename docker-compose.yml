@@ -1,0 +1,41 @@
+services:
+  db:
+    image: postgres:16
+    container_name: conectacae-db
+    environment:
+      POSTGRES_DB: ${DB_NAME:?DB_NAME nao definido (defina no .env ou no ambiente)}
+      POSTGRES_USER: ${DB_USER:?DB_USER nao definido (defina no .env ou no ambiente)}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD nao definido (defina no .env ou no ambiente)}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    image: kuhnenz/apoiopsicologicocae:latest
+    container_name: conectacae-backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    environment:
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:?DJANGO_SECRET_KEY nao definido (defina no .env ou no ambiente)}
+      DJANGO_DEBUG: ${DJANGO_DEBUG:-True}
+      DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS:-*}
+      DB_HOST: db
+      DB_PORT: "5432"
+      DB_NAME: ${DB_NAME:?DB_NAME nao definido (defina no .env ou no ambiente)}
+      DB_USER: ${DB_USER:?DB_USER nao definido (defina no .env ou no ambiente)}
+      DB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD nao definido (defina no .env ou no ambiente)}
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
