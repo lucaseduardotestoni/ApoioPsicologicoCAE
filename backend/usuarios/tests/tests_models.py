@@ -1,5 +1,5 @@
 from django.test import TestCase
-from pytz import timezone
+from django.utils import timezone
 from usuarios.models import Usuario, GrupoUsuario
 
 class GrupoUsuarioModelTest(TestCase):
