@@ -186,18 +186,26 @@ http://localhost:4200/
 
 ## Pipeline CI/CD
 
-O projeto utiliza GitHub Actions para automação de integração contínua (CI/CD).
+O projeto utiliza GitHub Actions para automação de integração(CI/CD).
 
 O pipeline realiza automaticamente:
 
 - instalação de dependências;
-- validação do backend Django;
-- verificação de migrations pendentes;
-- execução de testes automatizados;
+- validação do backend Django (system checks e migrations pendentes);
+- execução de testes automatizados em matriz (Python 3.12 e 3.13);
 - integração com PostgreSQL em container Docker;
-- validação de build da aplicação.
+- empacotamento do backend como artefato (`tar.gz`);
+- build e publicação da imagem Docker no Docker Hub (tags `:latest` e `:SHA do commit`).
 
 As credenciais utilizadas no pipeline são armazenadas de forma segura utilizando GitHub Secrets.
+
+---
+
+## Imagem Docker
+
+A imagem do backend é construída e publicada automaticamente pelo pipeline a cada push na branch `main`.
+
+🐳 **Docker Hub:** https://hub.docker.com/r/kuhnenz/apoiopsicologicocae
 
 ---
 
@@ -209,7 +217,6 @@ O projeto utiliza organização de branches baseada em separação entre desenvo
 
 - `main` → versão estável do sistema;
 - `develop` → integração de funcionalidades em desenvolvimento;
-- `feature/*` → desenvolvimento isolado de novas funcionalidades.
 
 ---
 
