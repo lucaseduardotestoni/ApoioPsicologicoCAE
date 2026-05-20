@@ -314,3 +314,4 @@ A tag `latest` é útil para ambientes de desenvolvimento e atualização rápid
 Durante o desenvolvimento do trabalho, foi possível compreender melhor o funcionamento de pipelines CI/CD utilizando GitHub Actions e integração com banco de dados em containers Docker.
 
 O trabalho permitiu aproximar o desenvolvimento acadêmico de práticas reais utilizadas em ambientes profissionais de DevOps.
+
